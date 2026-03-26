@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WayGG | Room 11 - Outside Gate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-0: #0a1221;
+            --bg-1: #162941;
+            --bg-2: #254560;
+            --panel: rgba(9, 19, 35, 0.78);
+            --line: rgba(170, 214, 255, 0.32);
+            --ink: #edf8ff;
+            --muted: #bdd1e0;
+            --accent: #89f1da;
+            --accent-2: #ffdca1;
+            --ok: #a8ffce;
+            --bad: #ffb3b5;
+            --warn: #ffd7a6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            font-family: "Manrope", "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 15% 15%, #2a4f73 0%, transparent 30%),
+                radial-gradient(circle at 82% 84%, #2b5761 0%, transparent 34%),
+                linear-gradient(140deg, var(--bg-0), var(--bg-1) 56%, var(--bg-2));
+            padding: 16px;
+            overflow-x: hidden;
+        }
+
+        .shell {
+            width: min(1140px, 100%);
+            margin: 0 auto;
+            display: grid;
+            gap: 16px;
+            animation: rise 0.7s ease;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.34);
+            backdrop-filter: blur(8px);
+        }
+
+        .hero { padding: 22px; display: grid; gap: 10px; }
+        .eyebrow { text-transform: uppercase; letter-spacing: 0.16em; color: var(--accent); font-weight: 700; font-size: 0.78rem; }
+        h1 { font-family: "Cinzel", Georgia, serif; font-size: clamp(1.95rem, 4.9vw, 3.2rem); line-height: 1.08; letter-spacing: 0.03em; }
+        .lead { color: var(--muted); max-width: 76ch; line-height: 1.6; }
+
+        .layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; }
+        .left, .right { padding: 16px; display: grid; gap: 12px; align-content: start; }
+
+        .locked {
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--warn);
+            padding: 18px;
+            line-height: 1.6;
+        }
+
+        .challenge {
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 14px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .challenge h2 { font-size: 1rem; }
+        .challenge p { color: var(--muted); font-size: 0.92rem; line-height: 1.46; }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip {
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--muted);
+            font-size: 0.78rem;
+            padding: 6px 10px;
+        }
+
+        .row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 200px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: rgba(3, 12, 12, 0.66);
+            color: var(--ink);
+            padding: 10px 12px;
+            outline: none;
+        }
+
+        input[type="text"]:focus { border-color: var(--accent); }
+
+        .btn {
+            border: 0;
+            border-radius: 999px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: #0d2a2c;
+            background: linear-gradient(130deg, var(--accent), #d9fff4);
+            transition: transform 0.2s ease, filter 0.2s ease;
+        }
+
+        .btn.alt { background: linear-gradient(130deg, var(--accent-2), #fff5cf); color: #4d3909; }
+        .btn.ghost { background: transparent; border: 1px solid var(--line); color: var(--ink); }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.04); }
+
+        .status { min-height: 1.24em; font-size: 0.9rem; }
+        .status.ok { color: var(--ok); }
+        .status.bad { color: var(--bad); }
+
+        .global { min-height: 1.32em; color: var(--warn); font-size: 0.92rem; }
+
+        .summary {
+            border: 1px dashed var(--line);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 14px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .stats { display: grid; gap: 8px; }
+        .stats li {
+            list-style: none;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 10px;
+            font-size: 0.9rem;
+        }
+
+        .stats span { color: var(--accent-2); font-weight: 700; }
+        .nav { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .ending {
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.34);
+            background: linear-gradient(150deg, rgba(171, 255, 238, 0.2), rgba(255, 240, 184, 0.18));
+            padding: 18px;
+            display: none;
+            gap: 10px;
+            animation: glow 0.9s ease;
+        }
+
+        .ending h3 { font-family: "Cinzel", Georgia, serif; font-size: 1.25rem; }
+        .ending p { color: #ecfffb; line-height: 1.6; }
+
+        .confetti {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            opacity: 0.8;
+            pointer-events: none;
+            animation: fall linear forwards;
+        }
+
+        @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes glow { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fall {
+            from { transform: translateY(-20px) rotate(0deg); }
+            to { transform: translateY(110vh) rotate(550deg); opacity: 0.08; }
+        }
+
+        @media (max-width: 920px) { .layout { grid-template-columns: 1fr; } }
+        @media (max-width: 560px) {
+            body { padding: 10px; }
+            .hero, .left, .right { padding: 14px; }
+            .btn { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <section class="panel hero">
+            <p class="eyebrow">Final Room - Room 11</p>
+            <h1>Outside Gate</h1>
+            <p class="lead">Final step for XYZ. Unlock the outside gate in this room to complete the full house escape story.</p>
+        </section>
+
+        <section class="layout">
+            <article class="panel left" id="leftPanel">
+                <section class="challenge">
+                    <h2>Challenge 1: Truth Cipher</h2>
+                    <p>Decode this shift+2 text by shifting backward 2: GZKVG</p>
+                    <div class="chips"><span class="chip">Caesar Reverse Shift 2</span></div>
+                    <div class="row">
+                        <input id="cipherInput" type="text" placeholder="Decoded word" autocomplete="off" />
+                        <button class="btn" id="cipherSubmit" type="button">Submit</button>
+                        <button class="btn ghost" id="hint1" type="button">Hint</button>
+                    </div>
+                    <p class="status" id="status1"></p>
+                </section>
+
+                <section class="challenge">
+                    <h2>Challenge 2: Exit Equation</h2>
+                    <p>Compute: (9 x 5) - (6 x 3)</p>
+                    <div class="chips"><span class="chip">Arithmetic Checkpoint</span></div>
+                    <div class="row">
+                        <input id="mathInput" type="text" placeholder="Numeric result" autocomplete="off" />
+                        <button class="btn" id="mathSubmit" type="button">Submit</button>
+                        <button class="btn ghost" id="hint2" type="button">Hint</button>
+                    </div>
+                    <p class="status" id="status2"></p>
+                </section>
+
+                <section class="challenge">
+                    <h2>Challenge 3: Outside Gate Key</h2>
+                    <p>Join answer1 + answer2 + EXIT (no spaces).</p>
+                    <div class="chips"><span class="chip">Format: WORDNUMBEREXIT</span></div>
+                    <div class="row">
+                        <input id="finalInput" type="text" placeholder="Final gate key" autocomplete="off" />
+                        <button class="btn alt" id="finalSubmit" type="button">Open Outside Gate</button>
+                        <button class="btn ghost" id="hint3" type="button">Hint</button>
+                    </div>
+                    <p class="status" id="status3"></p>
+                </section>
+
+                <p class="global" id="globalStatus"></p>
+
+                <section class="ending" id="endingCard">
+                    <h3>Escape Complete</h3>
+                    <p>You reached outside. The home is behind you, the mystery is solved, and the run is complete.</p>
+                    <div class="summary">
+                        <p><strong>Completion Time:</strong> <span id="completedAt">-</span></p>
+                        <p><strong>Result:</strong> Successfully Escaped Home</p>
+                    </div>
+                    <div class="nav">
+                        <a class="btn" href="home.html">Return To Home Hub</a>
+                        <button class="btn ghost" type="button" id="newRunBtn">Start New Run</button>
+                    </div>
+                </section>
+
+                <div class="nav">
+                    <a class="btn ghost" href="room10.html">Back To Room 10</a>
+                    <a class="btn ghost" href="home.html">Home</a>
+                </div>
+            </article>
+
+            <aside class="panel right">
+                <h2>Final Run Stats</h2>
+                <ul class="stats">
+                    <li><strong>Player</strong><span id="playerName">Explorer</span></li>
+                    <li><strong>Rank</strong><span id="rank">Beginner</span></li>
+                    <li><strong>Points</strong><span id="points">0</span></li>
+                    <li><strong>Clues</strong><span id="clues">0</span></li>
+                    <li><strong>Hints Left</strong><span id="hints">3</span></li>
+                    <li><strong>Attempts</strong><span id="attempts">0</span></li>
+                </ul>
+
+                <h2>End Rules</h2>
+                <div class="summary">
+                    <p>1. Room 11 opens only after Room 10 completion.</p>
+                    <p>2. Wrong attempts cost 10 points (minimum 0).</p>
+                    <p>3. First hint use per challenge consumes one hint.</p>
+                    <p>4. Finishing this room marks the full game as completed.</p>
+                </div>
+            </aside>
+        </section>
+    </main>
+
+    <script>
+        (function () {
+            const STORAGE_PROGRESS_KEY = "escapeProgress";
+            const STORAGE_ROOM_KEY = "roomProgress";
+            const ROOM_NUMBER = 11;
+
+            const leftPanel = document.getElementById("leftPanel");
+            const globalStatus = document.getElementById("globalStatus");
+            const endingCard = document.getElementById("endingCard");
+            const completedAtEl = document.getElementById("completedAt");
+
+            const status1 = document.getElementById("status1");
+            const status2 = document.getElementById("status2");
+            const status3 = document.getElementById("status3");
+
+            const playerNameEl = document.getElementById("playerName");
+            const rankEl = document.getElementById("rank");
+            const pointsEl = document.getElementById("points");
+            const cluesEl = document.getElementById("clues");
+            const hintsEl = document.getElementById("hints");
+            const attemptsEl = document.getElementById("attempts");
+
+            const inputs = {
+                cipher: document.getElementById("cipherInput"),
+                math: document.getElementById("mathInput"),
+                finalCode: document.getElementById("finalInput")
+            };
+
+            const uiState = {
+                solved: { c1: false, c2: false, c3: false },
+                attempts: 0,
+                usedHints: { c1: false, c2: false, c3: false },
+                completedAt: ""
+            };
+
+            function normalize(value) {
+                return String(value || "").trim().replace(/\s+/g, " ").toUpperCase();
+            }
+
+            function compact(value) {
+                return normalize(value).replace(/\s+/g, "");
+            }
+
+            function digits(value) {
+                return compact(value).replace(/[^0-9]/g, "");
+            }
+
+            function readJson(key, fallback) {
+                try {
+                    const raw = localStorage.getItem(key);
+                    if (!raw) return fallback;
+                    const parsed = JSON.parse(raw);
+                    return parsed && typeof parsed === "object" ? parsed : fallback;
+                } catch (error) {
+                    return fallback;
+                }
+            }
+
+            const progress = {
+                playerName: "Explorer",
+                rank: "Beginner",
+                points: 0,
+                clues: 0,
+                hintsLeft: 3,
+                maxUnlockedRoom: 1,
+                gameCompleted: false,
+                completedAt: "",
+                ...readJson(STORAGE_PROGRESS_KEY, {})
+            };
+
+            const allRoomProgress = readJson(STORAGE_ROOM_KEY, {});
+            const roomKey = "room" + ROOM_NUMBER;
+            const savedRoom = allRoomProgress[roomKey] || {};
+            const room10Progress = allRoomProgress.room10 || {};
+
+            if (savedRoom.solved && typeof savedRoom.solved === "object") {
+                uiState.solved = { ...uiState.solved, ...savedRoom.solved };
+            }
+            if (Number.isFinite(savedRoom.attempts)) {
+                uiState.attempts = Math.max(0, savedRoom.attempts);
+            }
+            if (savedRoom.usedHints && typeof savedRoom.usedHints === "object") {
+                uiState.usedHints = { ...uiState.usedHints, ...savedRoom.usedHints };
+            }
+            if (typeof savedRoom.completedAt === "string") {
+                uiState.completedAt = savedRoom.completedAt;
+            }
+
+            function saveState() {
+                localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
+                allRoomProgress[roomKey] = {
+                    solved: uiState.solved,
+                    completed: uiState.solved.c3,
+                    attempts: uiState.attempts,
+                    usedHints: uiState.usedHints,
+                    completedAt: uiState.completedAt,
+                    updatedAt: new Date().toISOString()
+                };
+                localStorage.setItem(STORAGE_ROOM_KEY, JSON.stringify(allRoomProgress));
+            }
+
+            function refreshStats() {
+                playerNameEl.textContent = progress.playerName || "Explorer";
+                rankEl.textContent = progress.rank || "Beginner";
+                pointsEl.textContent = String(Math.max(0, Number(progress.points) || 0));
+                cluesEl.textContent = String(Math.max(0, Number(progress.clues) || 0));
+                hintsEl.textContent = String(Math.max(0, Number(progress.hintsLeft) || 0));
+                attemptsEl.textContent = String(uiState.attempts);
+            }
+
+            function setStatus(node, message, success) {
+                node.textContent = message;
+                node.className = "status " + (success ? "ok" : "bad");
+            }
+
+            function spendMistakePenalty() {
+                uiState.attempts += 1;
+                progress.points = Math.max(0, (Number(progress.points) || 0) - 10);
+                refreshStats();
+                saveState();
+            }
+
+            function consumeHint(hintKey) {
+                if (uiState.usedHints[hintKey]) return true;
+                const left = Number(progress.hintsLeft) || 0;
+                if (left <= 0) {
+                    globalStatus.textContent = "No hints left in this run.";
+                    return false;
+                }
+                progress.hintsLeft = left - 1;
+                uiState.usedHints[hintKey] = true;
+                refreshStats();
+                saveState();
+                return true;
+            }
+
+            function setDisabled(id, disabled) {
+                const input = document.getElementById(id + "Input");
+                const submit = document.getElementById(id + "Submit");
+                if (input) input.disabled = disabled;
+                if (submit) submit.disabled = disabled;
+            }
+
+            function setLockState() {
+                setDisabled("math", !uiState.solved.c1);
+                setDisabled("final", !uiState.solved.c2);
+            }
+
+            function showEnding() {
+                endingCard.style.display = "grid";
+                completedAtEl.textContent = progress.completedAt || uiState.completedAt || new Date().toLocaleString();
+            }
+
+            function spawnConfetti() {
+                const colors = ["#9ff5e5", "#ffe8aa", "#b7fcb6", "#e5fff9"];
+                const count = 60;
+                for (let i = 0; i < count; i += 1) {
+                    const node = document.createElement("span");
+                    node.className = "confetti";
+                    node.style.left = Math.random() * 100 + "vw";
+                    node.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    node.style.animationDuration = (3 + Math.random() * 3).toFixed(2) + "s";
+                    node.style.animationDelay = (Math.random() * 0.6).toFixed(2) + "s";
+                    document.body.appendChild(node);
+                    setTimeout(function () {
+                        if (node.parentNode) node.parentNode.removeChild(node);
+                    }, 7000);
+                }
+            }
+
+            function gateRoomAccess() {
+                const unlockedFromHome = (Number(progress.maxUnlockedRoom) || 1) >= 11;
+                const unlockedFromRoom10 = room10Progress.completed === true;
+                const alreadyComplete = uiState.solved.c3 || progress.gameCompleted === true;
+
+                if (alreadyComplete) {
+                    showEnding();
+                    return true;
+                }
+
+                if (unlockedFromHome || unlockedFromRoom10) {
+                    return true;
+                }
+
+                leftPanel.innerHTML =
+                    '<section class="locked">Room 11 is locked. Complete Room 10 first to reach the outside gate.<br><br><a class="btn ghost" href="room10.html">Go To Room 10</a></section>';
+                return false;
+            }
+
+            function finishGame() {
+                uiState.solved.c3 = true;
+                uiState.completedAt = new Date().toLocaleString();
+
+                progress.points = Math.max(0, Number(progress.points) || 0) + 800;
+                progress.clues = Math.max(0, Number(progress.clues) || 0) + 15;
+                progress.rank = "Legendary Escapist";
+                progress.maxUnlockedRoom = Math.max(11, Number(progress.maxUnlockedRoom) || 1);
+                progress.gameCompleted = true;
+                progress.completedAt = uiState.completedAt;
+
+                setStatus(status3, "Gate key accepted. You are outside.", true);
+                globalStatus.textContent = "Escape complete. You finally reached out of home.";
+                refreshStats();
+                saveState();
+                showEnding();
+                spawnConfetti();
+            }
+
+            function bindEvents() {
+                document.getElementById("cipherSubmit").addEventListener("click", function () {
+                    if (uiState.solved.c1) return;
+                    if (compact(inputs.cipher.value) === "EVITE") {
+                        uiState.solved.c1 = true;
+                        setStatus(status1, "Correct. Challenge 2 unlocked.", true);
+                        setLockState();
+                        saveState();
+                        return;
+                    }
+                    spendMistakePenalty();
+                    setStatus(status1, "Incorrect. Shift GZKVG backward by 2.", false);
+                });
+
+                document.getElementById("mathSubmit").addEventListener("click", function () {
+                    if (!uiState.solved.c1 || uiState.solved.c2) return;
+                    if (digits(inputs.math.value) === "27") {
+                        uiState.solved.c2 = true;
+                        setStatus(status2, "Correct. Final gate key unlocked.", true);
+                        setLockState();
+                        saveState();
+                        return;
+                    }
+                    spendMistakePenalty();
+                    setStatus(status2, "Incorrect. Calculate (9x5)-(6x3).", false);
+                });
+
+                document.getElementById("finalSubmit").addEventListener("click", function () {
+                    if (!uiState.solved.c2 || uiState.solved.c3) return;
+                    if (compact(inputs.finalCode.value) === "EVITE27EXIT") {
+                        finishGame();
+                        return;
+                    }
+                    spendMistakePenalty();
+                    setStatus(status3, "Wrong key. Use answer1 + answer2 + EXIT.", false);
+                });
+
+                document.getElementById("hint1").addEventListener("click", function () {
+                    if (!consumeHint("c1")) return;
+                    globalStatus.textContent = "Hint 1: G->E, Z->X, K->I...";
+                });
+
+                document.getElementById("hint2").addEventListener("click", function () {
+                    if (!consumeHint("c2")) return;
+                    globalStatus.textContent = "Hint 2: 45 - 18.";
+                });
+
+                document.getElementById("hint3").addEventListener("click", function () {
+                    if (!consumeHint("c3")) return;
+                    globalStatus.textContent = "Hint 3: EVITE + 27 + EXIT.";
+                });
+
+                document.getElementById("newRunBtn").addEventListener("click", function () {
+                    localStorage.removeItem(STORAGE_PROGRESS_KEY);
+                    localStorage.removeItem(STORAGE_ROOM_KEY);
+                    window.location.href = "home.html";
+                });
+            }
+
+            if (!gateRoomAccess()) {
+                refreshStats();
+                return;
+            }
+
+            if (uiState.solved.c1) setStatus(status1, "Already solved.", true);
+            if (uiState.solved.c2) setStatus(status2, "Already solved.", true);
+            if (uiState.solved.c3 || progress.gameCompleted) {
+                uiState.solved.c3 = true;
+                setStatus(status3, "Already solved.", true);
+                globalStatus.textContent = "Game already complete. You are outside the home.";
+            }
+
+            setLockState();
+            refreshStats();
+            bindEvents();
+            saveState();
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WayGG | Room 7 - Attic Cipher Machine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-0: #0e111b;
+            --bg-1: #182137;
+            --bg-2: #20304f;
+            --panel: rgba(10, 16, 31, 0.78);
+            --line: rgba(155, 217, 255, 0.26);
+            --ink: #f1f8ff;
+            --muted: #c1d4e4;
+            --accent: #84e6ff;
+            --accent-2: #ffd08f;
+            --ok: #93f8db;
+            --bad: #ff9ea0;
+            --warn: #ffdcb2;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            font-family: "Manrope", "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 12% 10%, #31567e 0%, transparent 36%),
+                radial-gradient(circle at 84% 74%, #2d5c68 0%, transparent 34%),
+                linear-gradient(145deg, var(--bg-0), var(--bg-1) 55%, var(--bg-2));
+            padding: 18px;
+        }
+
+        .shell { width: min(1120px, 100%); margin: 0 auto; display: grid; gap: 16px; animation: reveal 0.58s ease; }
+        .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; backdrop-filter: blur(8px); box-shadow: 0 10px 26px rgba(0,0,0,0.28); }
+        .top { padding: 20px; display: grid; gap: 10px; }
+        .eyebrow { color: var(--accent); text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.78rem; font-weight: 700; }
+        h1 { font-family: "Cinzel", Georgia, serif; font-size: clamp(1.8rem, 4.7vw, 3rem); letter-spacing: 0.04em; line-height: 1.1; }
+        .lead { color: var(--muted); max-width: 72ch; line-height: 1.6; }
+
+        .layout { display: grid; grid-template-columns: 1.45fr 1fr; gap: 16px; }
+        .puzzles, .meta { padding: 18px; display: grid; gap: 12px; align-content: start; }
+
+        .locked-screen { border: 1px solid var(--line); border-radius: 12px; padding: 18px; color: var(--warn); background: rgba(255,255,255,0.04); line-height: 1.5; }
+        .challenge { border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: rgba(255,255,255,0.04); display: grid; gap: 8px; }
+        .challenge h2 { font-size: 1rem; }
+        .challenge p { color: var(--muted); font-size: 0.92rem; line-height: 1.45; }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip { border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; font-size: 0.78rem; color: var(--muted); background: rgba(255,255,255,0.03); }
+        .row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 190px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: rgba(6, 10, 24, 0.65);
+            color: var(--ink);
+            padding: 10px 12px;
+            outline: none;
+        }
+
+        input[type="text"]:focus { border-color: var(--accent); }
+
+        .btn {
+            border: 0;
+            border-radius: 999px;
+            padding: 10px 15px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: #102837;
+            background: linear-gradient(130deg, var(--accent), #bff5ff);
+            transition: transform 0.2s ease, filter 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn.alt { background: linear-gradient(130deg, var(--accent-2), #ffe5ba); }
+        .btn.ghost { color: var(--ink); background: transparent; border: 1px solid var(--line); }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
+
+        .status { min-height: 1.25em; font-size: 0.9rem; }
+        .status.ok { color: var(--ok); }
+        .status.bad { color: var(--bad); }
+
+        .stats { display: grid; gap: 8px; }
+        .stats li {
+            list-style: none;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 10px;
+            font-size: 0.9rem;
+        }
+
+        .stats span { color: var(--accent-2); font-weight: 700; }
+        .rules { color: var(--muted); font-size: 0.9rem; line-height: 1.54; display: grid; gap: 6px; }
+        .global-status { min-height: 1.35em; color: var(--warn); font-size: 0.92rem; }
+        .nav { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        @keyframes reveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+        @media (max-width: 560px) {
+            body { padding: 10px; }
+            .top, .puzzles, .meta { padding: 14px; }
+            .btn { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <section class="panel top">
+            <p class="eyebrow">Room 7 Of 11</p>
+            <h1>Attic Cipher Machine</h1>
+            <p class="lead">In the attic, an old family machine still encodes keys. Crack each stage to unlock Room 8.</p>
+        </section>
+
+        <section class="layout">
+            <article class="panel puzzles" id="puzzleContainer">
+                <section class="challenge">
+                    <h2>Challenge 1: Caesar Shift</h2>
+                    <p>Decode this shift-3 message: FRGH</p>
+                    <div class="chips"><span class="chip">Shift backward by 3</span></div>
+                    <div class="row">
+                        <input id="caesarInput" type="text" autocomplete="off" placeholder="Decoded word" />
+                        <button class="btn" id="caesarSubmit" type="button">Submit</button>
+                        <button class="btn ghost" id="hint1" type="button">Hint</button>
+                    </div>
+                    <p class="status" id="status1"></p>
+                </section>
+
+                <section class="challenge">
+                    <h2>Challenge 2: Reverse Key</h2>
+                    <p>Reverse the string: ZEBRA</p>
+                    <div class="chips"><span class="chip">Read right to left</span></div>
+                    <div class="row">
+                        <input id="reverseInput" type="text" autocomplete="off" placeholder="Reversed key" />
+                        <button class="btn" id="reverseSubmit" type="button">Submit</button>
+                        <button class="btn ghost" id="hint2" type="button">Hint</button>
+                    </div>
+                    <p class="status" id="status2"></p>
+                </section>
+
+                <section class="challenge">
+                    <h2>Challenge 3: Rotor Value</h2>
+                    <p>Rotor values are 4, 2, and 1. Add them together.</p>
+                    <div class="chips"><span class="chip">Simple sum</span></div>
+                    <div class="row">
+                        <input id="rotorInput" type="text" autocomplete="off" placeholder="Numeric sum" />
+                        <button class="btn" id="rotorSubmit" type="button">Submit</button>
+                        <button class="btn ghost" id="hint3" type="button">Hint</button>
+                    </div>
+                    <p class="status" id="status3"></p>
+                </section>
+
+                <section class="challenge">
+                    <h2>Challenge 4: Engine Passphrase</h2>
+                    <p>Concatenate answers 1 + 2 + 3 without spaces.</p>
+                    <div class="chips"><span class="chip">Format: WORDWORDNUMBER</span></div>
+                    <div class="row">
+                        <input id="finalInput" type="text" autocomplete="off" placeholder="Passphrase" />
+                        <button class="btn alt" id="finalSubmit" type="button">Unlock Room 8</button>
+                        <button class="btn ghost" id="hint4" type="button">Hint</button>
+                    </div>
+                    <p class="status" id="status4"></p>
+                </section>
+
+                <p class="global-status" id="globalStatus"></p>
+                <div class="nav">
+                    <a class="btn ghost" href="home.html">Back To Home</a>
+                    <a class="btn ghost" href="room6.html">Back To Room 6</a>
+                    <a class="btn ghost" href="room8.html" id="room8Link" style="display: none;">Enter Room 8</a>
+                </div>
+            </article>
+
+            <aside class="panel meta">
+                <h2>Session Stats</h2>
+                <ul class="stats">
+                    <li><strong>Player</strong><span id="playerName">Explorer</span></li>
+                    <li><strong>Rank</strong><span id="rank">Beginner</span></li>
+                    <li><strong>Points</strong><span id="points">0</span></li>
+                    <li><strong>Clues</strong><span id="clues">0</span></li>
+                    <li><strong>Hints Left</strong><span id="hints">3</span></li>
+                    <li><strong>Attempts</strong><span id="attempts">0</span></li>
+                </ul>
+
+                <h2>Room Rules</h2>
+                <div class="rules">
+                    <p>1. Room 7 requires Room 6 completion or unlocked access from global progress.</p>
+                    <p>2. Wrong attempts reduce points by 10, minimum 0.</p>
+                    <p>3. First hint use on each challenge consumes one hint.</p>
+                    <p>4. Completing Room 7 unlocks Room 8 and grants rewards.</p>
+                </div>
+            </aside>
+        </section>
+    </main>
+
+    <script>
+        (function () {
+            const STORAGE_PROGRESS_KEY = "escapeProgress";
+            const STORAGE_ROOM_KEY = "roomProgress";
+            const ROOM_NUMBER = 7;
+
+            const puzzleContainer = document.getElementById("puzzleContainer");
+            const globalStatus = document.getElementById("globalStatus");
+            const room8Link = document.getElementById("room8Link");
+
+            const status1 = document.getElementById("status1");
+            const status2 = document.getElementById("status2");
+            const status3 = document.getElementById("status3");
+            const status4 = document.getElementById("status4");
+
+            const playerNameEl = document.getElementById("playerName");
+            const rankEl = document.getElementById("rank");
+            const pointsEl = document.getElementById("points");
+            const cluesEl = document.getElementById("clues");
+            const hintsEl = document.getElementById("hints");
+            const attemptsEl = document.getElementById("attempts");
+
+            const inputs = {
+                caesar: document.getElementById("caesarInput"),
+                reverse: document.getElementById("reverseInput"),
+                rotor: document.getElementById("rotorInput"),
+                finalCode: document.getElementById("finalInput")
+            };
+
+            const uiState = {
+                solved: { c1: false, c2: false, c3: false, c4: false },
+                attempts: 0,
+                usedHints: { c1: false, c2: false, c3: false, c4: false }
+            };
+
+            function normalize(value) {
+                return String(value || "").trim().replace(/\s+/g, " ").toUpperCase();
+            }
+
+            function compact(value) {
+                return normalize(value).replace(/\s+/g, "");
+            }
+
+            function digits(value) {
+                return compact(value).replace(/[^0-9]/g, "");
+            }
+
+            function readJson(key, fallback) {
+                try {
+                    const raw = localStorage.getItem(key);
+                    if (!raw) return fallback;
+                    const parsed = JSON.parse(raw);
+                    return parsed && typeof parsed === "object" ? parsed : fallback;
+                } catch (error) {
+                    return fallback;
+                }
+            }
+
+            const progress = {
+                playerName: "Explorer",
+                rank: "Beginner",
+                points: 0,
+                clues: 0,
+                hintsLeft: 3,
+                maxUnlockedRoom: 1,
+                ...readJson(STORAGE_PROGRESS_KEY, {})
+            };
+
+            const allRoomProgress = readJson(STORAGE_ROOM_KEY, {});
+            const roomKey = "room" + ROOM_NUMBER;
+            const savedRoom = allRoomProgress[roomKey] || {};
+            const room6Progress = allRoomProgress.room6 || {};
+
+            if (savedRoom.solved && typeof savedRoom.solved === "object") {
+                uiState.solved = { ...uiState.solved, ...savedRoom.solved };
+            }
+            if (Number.isFinite(savedRoom.attempts)) {
+                uiState.attempts = Math.max(0, savedRoom.attempts);
+            }
+            if (savedRoom.usedHints && typeof savedRoom.usedHints === "object") {
+                uiState.usedHints = { ...uiState.usedHints, ...savedRoom.usedHints };
+            }
+
+            function saveState() {
+                localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
+                allRoomProgress[roomKey] = {
+                    solved: uiState.solved,
+                    completed: uiState.solved.c4,
+                    attempts: uiState.attempts,
+                    usedHints: uiState.usedHints,
+                    updatedAt: new Date().toISOString()
+                };
+                localStorage.setItem(STORAGE_ROOM_KEY, JSON.stringify(allRoomProgress));
+            }
+
+            function setStatus(node, message, success) {
+                node.textContent = message;
+                node.className = "status " + (success ? "ok" : "bad");
+            }
+
+            function refreshStats() {
+                playerNameEl.textContent = progress.playerName || "Explorer";
+                rankEl.textContent = progress.rank || "Beginner";
+                pointsEl.textContent = String(Math.max(0, Number(progress.points) || 0));
+                cluesEl.textContent = String(Math.max(0, Number(progress.clues) || 0));
+                hintsEl.textContent = String(Math.max(0, Number(progress.hintsLeft) || 0));
+                attemptsEl.textContent = String(uiState.attempts);
+            }
+
+            function spendMistakePenalty() {
+                uiState.attempts += 1;
+                progress.points = Math.max(0, (Number(progress.points) || 0) - 10);
+                refreshStats();
+                saveState();
+            }
+
+            function consumeHint(hintKey) {
+                if (uiState.usedHints[hintKey]) return true;
+                const left = Number(progress.hintsLeft) || 0;
+                if (left <= 0) {
+                    globalStatus.textContent = "No hints left in this run.";
+                    return false;
+                }
+                progress.hintsLeft = left - 1;
+                uiState.usedHints[hintKey] = true;
+                refreshStats();
+                saveState();
+                return true;
+            }
+
+            function setDisabled(id, disabled) {
+                const input = document.getElementById(id + "Input");
+                const submit = document.getElementById(id + "Submit");
+                if (input) input.disabled = disabled;
+                if (submit) submit.disabled = disabled;
+            }
+
+            function setLockState() {
+                setDisabled("reverse", !uiState.solved.c1);
+                setDisabled("rotor", !uiState.solved.c2);
+                setDisabled("final", !uiState.solved.c3);
+            }
+
+            function gateRoomAccess() {
+                const unlockedFromHome = (Number(progress.maxUnlockedRoom) || 1) >= 7;
+                const unlockedFromRoom6 = room6Progress.completed === true;
+                const alreadyCompleted = uiState.solved.c4;
+
+                if (alreadyCompleted) {
+                    room8Link.style.display = "inline-flex";
+                    return true;
+                }
+                if (unlockedFromHome || unlockedFromRoom6) {
+                    return true;
+                }
+
+                puzzleContainer.innerHTML =
+                    '<section class="locked-screen">Room 7 is locked. Complete Room 6 first, then return here.<br><br><a class="btn ghost" href="room6.html">Go To Room 6</a></section>';
+                return false;
+            }
+
+            function finalizeRoom7() {
+                uiState.solved.c4 = true;
+                progress.points = Math.max(0, Number(progress.points) || 0) + 340;
+                progress.clues = Math.max(0, Number(progress.clues) || 0) + 8;
+                progress.maxUnlockedRoom = Math.max(8, Number(progress.maxUnlockedRoom) || 1);
+                if ((Number(progress.points) || 0) >= 2000) {
+                    progress.rank = "Cipher Commander";
+                }
+                room8Link.style.display = "inline-flex";
+                setStatus(status4, "Engine solved. Room 8 unlocked.", true);
+                globalStatus.textContent = "Room 7 complete. Continue to Room 8.";
+                refreshStats();
+                saveState();
+            }
+
+            function bindEvents() {
+                document.getElementById("caesarSubmit").addEventListener("click", function () {
+                    if (uiState.solved.c1) return;
+                    if (compact(inputs.caesar.value) === "CODE") {
+                        uiState.solved.c1 = true;
+                        setStatus(status1, "Correct. Challenge 2 unlocked.", true);
+                        setLockState();
+                        saveState();
+                        return;
+                    }
+                    spendMistakePenalty();
+                    setStatus(status1, "Wrong answer. Shift FRGH back by 3.", false);
+                });
+
+                document.getElementById("reverseSubmit").addEventListener("click", function () {
+                    if (!uiState.solved.c1 || uiState.solved.c2) return;
+                    if (compact(inputs.reverse.value) === "ARBEZ") {
+                        uiState.solved.c2 = true;
+                        setStatus(status2, "Correct. Challenge 3 unlocked.", true);
+                        setLockState();
+                        saveState();
+                        return;
+                    }
+                    spendMistakePenalty();
+                    setStatus(status2, "Wrong answer. Reverse the full string.", false);
+                });
+
+                document.getElementById("rotorSubmit").addEventListener("click", function () {
+                    if (!uiState.solved.c2 || uiState.solved.c3) return;
+                    if (digits(inputs.rotor.value) === "7") {
+                        uiState.solved.c3 = true;
+                        setStatus(status3, "Correct. Final passphrase unlocked.", true);
+                        setLockState();
+                        saveState();
+                        return;
+                    }
+                    spendMistakePenalty();
+                    setStatus(status3, "Wrong answer. Add 4 + 2 + 1.", false);
+                });
+
+                document.getElementById("finalSubmit").addEventListener("click", function () {
+                    if (!uiState.solved.c3 || uiState.solved.c4) return;
+                    if (compact(inputs.finalCode.value) === "CODEARBEZ7") {
+                        finalizeRoom7();
+                        return;
+                    }
+                    spendMistakePenalty();
+                    setStatus(status4, "Wrong passphrase. Format: CODE + ARBEZ + 7.", false);
+                });
+
+                document.getElementById("hint1").addEventListener("click", function () {
+                    if (!consumeHint("c1")) return;
+                    globalStatus.textContent = "Hint 1: Coded text FRGH becomes CODE with -3 shift.";
+                });
+
+                document.getElementById("hint2").addEventListener("click", function () {
+                    if (!consumeHint("c2")) return;
+                    globalStatus.textContent = "Hint 2: Last letter becomes first when reversed.";
+                });
+
+                document.getElementById("hint3").addEventListener("click", function () {
+                    if (!consumeHint("c3")) return;
+                    globalStatus.textContent = "Hint 3: This one is straightforward addition.";
+                });
+
+                document.getElementById("hint4").addEventListener("click", function () {
+                    if (!consumeHint("c4")) return;
+                    globalStatus.textContent = "Hint 4: Final string is CODE + ARBEZ + 7.";
+                });
+            }
+
+            if (!gateRoomAccess()) {
+                refreshStats();
+                return;
+            }
+
+            if (uiState.solved.c1) setStatus(status1, "Already solved.", true);
+            if (uiState.solved.c2) setStatus(status2, "Already solved.", true);
+            if (uiState.solved.c3) setStatus(status3, "Already solved.", true);
+            if (uiState.solved.c4) {
+                setStatus(status4, "Already solved.", true);
+                room8Link.style.display = "inline-flex";
+                globalStatus.textContent = "Room 7 already complete. Continue to Room 8.";
+            }
+
+            setLockState();
+            refreshStats();
+            bindEvents();
+            saveState();
+        })();
+    </script>
+</body>
+</html>

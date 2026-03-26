@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WayGG | Room 1 - Front Door Foyer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-0: #0a111d;
+            --bg-1: #14263d;
+            --bg-2: #1e4360;
+            --panel: rgba(7, 15, 29, 0.82);
+            --line: rgba(157, 201, 237, 0.34);
+            --ink: #f4fbff;
+            --muted: #b8cfde;
+            --accent: #f7c472;
+            --accent-2: #8ff2db;
+            --ok: #8ff2db;
+            --bad: #ff9ea0;
+            --warn: #ffd59a;
+            --note: #f8e18d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            font-family: "Manrope", "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 10% 8%, #2a537d 0%, transparent 34%),
+                radial-gradient(circle at 88% 80%, #2c5b62 0%, transparent 33%),
+                linear-gradient(145deg, var(--bg-0), var(--bg-1) 55%, var(--bg-2));
+            padding: 16px;
+        }
+
+        .shell {
+            width: min(1160px, 100%);
+            margin: 0 auto;
+            display: grid;
+            gap: 14px;
+            animation: rise 0.55s ease;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28);
+            backdrop-filter: blur(8px);
+        }
+
+        .top {
+            padding: 18px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .eyebrow {
+            color: var(--accent-2);
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        h1 {
+            font-family: "Cinzel", Georgia, serif;
+            font-size: clamp(1.8rem, 4.8vw, 3rem);
+            line-height: 1.1;
+            letter-spacing: 0.04em;
+        }
+
+        .lead { color: var(--muted); line-height: 1.6; max-width: 72ch; }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 14px;
+        }
+
+        .scene, .meta {
+            padding: 16px;
+            display: grid;
+            gap: 12px;
+            align-content: start;
+        }
+
+        .room-shell {
+            border: 2px solid rgba(155, 196, 228, 0.58);
+            border-radius: 2px;
+            background:
+                linear-gradient(to bottom, rgba(31, 55, 79, 0.65) 0 58%, rgba(60, 44, 34, 0.72) 58% 100%),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 30px);
+            min-height: 470px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .window {
+            position: absolute;
+            left: 5%;
+            top: 8%;
+            width: 22%;
+            height: 24%;
+            border: 3px solid #7ca2bf;
+            background: linear-gradient(180deg, rgba(145, 214, 255, 0.5), rgba(74, 127, 166, 0.35));
+        }
+
+        .window::before,
+        .window::after {
+            content: "";
+            position: absolute;
+            background: rgba(107, 150, 183, 0.92);
+        }
+
+        .window::before { left: 50%; top: 0; width: 3px; height: 100%; transform: translateX(-50%); }
+        .window::after { top: 50%; left: 0; height: 3px; width: 100%; transform: translateY(-50%); }
+
+        .painting {
+            position: absolute;
+            left: 33%;
+            top: 9%;
+            width: 20%;
+            height: 16%;
+            border: 4px solid #7b5a2d;
+            background: linear-gradient(130deg, #6b3853, #26566a);
+            clip-path: polygon(0 0, 100% 0, 96% 100%, 4% 100%);
+        }
+
+        .sofa {
+            position: absolute;
+            left: 9%;
+            bottom: 7%;
+            width: 42%;
+            height: 21%;
+            background: linear-gradient(180deg, #2c455d, #1f3348);
+            border: 2px solid rgba(174, 211, 240, 0.4);
+            clip-path: polygon(0 22%, 10% 0, 90% 0, 100% 22%, 100% 100%, 0 100%);
+        }
+
+        .table {
+            position: absolute;
+            left: 45%;
+            bottom: 18%;
+            width: 16%;
+            height: 9%;
+            background: linear-gradient(180deg, #6b523f, #4d3a2d);
+            border: 2px solid rgba(223, 196, 171, 0.55);
+        }
+
+        .door-frame {
+            position: absolute;
+            right: 4%;
+            top: 12%;
+            width: 20%;
+            height: 76%;
+            border: 3px solid #7f9eb5;
+            background: rgba(0, 0, 0, 0.14);
+            display: grid;
+            place-items: center;
+        }
+
+        .door-panel {
+            width: 88%;
+            height: 92%;
+            border: 2px solid #8dabbf;
+            background: linear-gradient(180deg, #2a4b69, #20374f);
+            position: relative;
+            display: grid;
+            place-items: center;
+            gap: 10px;
+        }
+
+        .keyhole {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid rgba(198, 218, 233, 0.8);
+            background: rgba(18, 29, 43, 0.95);
+            position: relative;
+        }
+
+        .keyhole::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 16px;
+            width: 4px;
+            height: 8px;
+            background: rgba(198, 218, 233, 0.8);
+        }
+
+        .keyhole.filled {
+            background: rgba(143, 242, 219, 0.95);
+            border-color: rgba(143, 242, 219, 0.95);
+            box-shadow: 0 0 12px rgba(143, 242, 219, 0.85);
+        }
+
+        .object {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.18s ease, filter 0.18s ease;
+            border: 2px solid rgba(170, 207, 231, 0.38);
+            background: rgba(4, 11, 22, 0.78);
+            display: grid;
+            place-items: center;
+            color: var(--ink);
+            font-weight: 700;
+            text-align: center;
+            padding: 6px;
+        }
+
+        .object:hover { transform: translateY(-2px) scale(1.02); filter: brightness(1.06); }
+
+        .object.vault {
+            left: 6%;
+            top: 38%;
+            width: 20%;
+            height: 19%;
+            clip-path: polygon(0 8%, 8% 0, 92% 0, 100% 8%, 100% 92%, 92% 100%, 8% 100%, 0 92%);
+        }
+
+        .object.drawer {
+            left: 38%;
+            top: 52%;
+            width: 23%;
+            height: 16%;
+            background: linear-gradient(180deg, #4c3a2e, #34261e);
+        }
+
+        .object.bag {
+            right: 29%;
+            top: 20%;
+            width: 16%;
+            height: 14%;
+            border-radius: 6px;
+            background: linear-gradient(180deg, #2a3240, #1c232f);
+        }
+
+        .object.solved {
+            border-color: rgba(143, 242, 219, 0.95);
+            box-shadow: 0 0 14px rgba(143, 242, 219, 0.62);
+        }
+
+        .obj-tag {
+            position: absolute;
+            bottom: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.74rem;
+            color: var(--muted);
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .keys-strip {
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            background: rgba(255,255,255,0.03);
+            padding: 10px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .key-chip {
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            color: var(--muted);
+            background: rgba(255,255,255,0.04);
+        }
+
+        .key-chip.found {
+            color: #0d2d2d;
+            border-color: rgba(143, 242, 219, 0.9);
+            background: rgba(143, 242, 219, 0.9);
+            font-weight: 700;
+        }
+
+        .notes {
+            border: 1px dashed rgba(247, 225, 141, 0.75);
+            border-radius: 4px;
+            background: rgba(247, 225, 141, 0.13);
+            padding: 10px;
+            display: grid;
+            gap: 7px;
+            min-height: 70px;
+        }
+
+        .notes p {
+            color: #fff2b9;
+            font-size: 0.85rem;
+            line-height: 1.45;
+        }
+
+        .global-status { min-height: 1.3em; color: var(--warn); font-size: 0.9rem; }
+        .nav { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .stats { display: grid; gap: 8px; }
+        .stats li {
+            list-style: none;
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            background: rgba(255,255,255,0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            font-size: 0.9rem;
+        }
+
+        .stats span { color: var(--accent); font-weight: 700; }
+
+        .rules {
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.52;
+            display: grid;
+            gap: 6px;
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            display: none;
+            place-items: center;
+            z-index: 50;
+            padding: 12px;
+        }
+
+        .overlay.show { display: grid; }
+
+        .modal {
+            width: min(660px, 100%);
+            background: #111e31;
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            padding: 12px;
+            display: grid;
+            gap: 10px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+            animation: rise 0.25s ease;
+        }
+
+        .modal h2 {
+            font-family: "Cinzel", Georgia, serif;
+            font-size: 1.2rem;
+            letter-spacing: 0.03em;
+        }
+
+        .modal p { color: var(--muted); line-height: 1.45; font-size: 0.9rem; }
+
+        .dialog-top {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .boss-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 4px;
+            border: 1px solid var(--line);
+            display: grid;
+            place-items: center;
+            background: rgba(255,255,255,0.08);
+            font-size: 1.5rem;
+        }
+
+        .speech {
+            background: var(--note);
+            color: #2a2203;
+            border: 2px solid #a08832;
+            border-radius: 4px;
+            padding: 12px;
+            line-height: 1.52;
+            font-size: 0.92rem;
+            font-weight: 600;
+        }
+
+        .status { min-height: 1.2em; font-size: 0.85rem; }
+        .status.ok { color: var(--ok); }
+        .status.bad { color: var(--bad); }
+
+        input[type="text"] {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            padding: 10px;
+            outline: none;
+            background: rgba(3, 8, 18, 0.72);
+            color: var(--ink);
+        }
+
+        input[type="text"]:focus { border-color: var(--accent-2); }
+
+        .btn {
+            border: 0;
+            border-radius: 999px;
+            padding: 9px 13px;
+            font-size: 0.84rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: #0f2334;
+            background: linear-gradient(130deg, var(--accent), #ffe3a9);
+            transition: transform 0.18s ease, filter 0.18s ease;
+        }
+
+        .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+        .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 980px) {
+            .layout { grid-template-columns: 1fr; }
+            .room-shell { min-height: 650px; }
+            .door-frame { right: 4%; top: 8%; width: 22%; height: 48%; }
+            .object.vault { left: 6%; top: 34%; width: 34%; height: 14%; }
+            .object.drawer { left: 46%; top: 52%; width: 30%; height: 12%; }
+            .object.bag { right: 28%; top: 64%; width: 24%; height: 10%; }
+        }
+
+        @media (max-width: 620px) {
+            body { padding: 10px; }
+            .top, .scene, .meta { padding: 12px; }
+            .room-shell { min-height: 760px; }
+            .door-frame { right: 3%; top: 4%; width: 32%; height: 28%; }
+            .object.vault { left: 8%; top: 38%; width: 84%; height: 11%; }
+            .object.drawer { left: 8%; top: 56%; width: 84%; height: 10%; }
+            .object.bag { left: 8%; top: 73%; width: 84%; height: 10%; right: auto; }
+            .btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="dialogPopup" aria-modal="true" role="dialog">
+        <div class="modal">
+            <div class="dialog-top">
+                <div class="boss-avatar" id="bossAvatar">🤖</div>
+                <strong id="dialogTitle">Boss Communication</strong>
+            </div>
+            <div class="speech" id="dialogMessage"></div>
+            <div class="row">
+                <button class="btn" id="dialogOkBtn" type="button">Understood</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="vaultAModal" aria-modal="true" role="dialog">
+        <div class="modal">
+            <h2>Desk Vault Challenge</h2>
+            <p>ROT13 clue: "GUR YNFG GJ B QVTVGF BS 5^4 NER ?"</p>
+            <input id="vault1Input" type="text" autocomplete="off" placeholder="Enter 2 digits" />
+            <div class="row">
+                <button class="btn" id="vault1Submit" type="button">Unlock Vault A</button>
+                <button class="btn ghost" id="hint1Btn" type="button">Hint</button>
+                <button class="btn ghost" data-close-modal="vaultAModal" type="button">Close</button>
+            </div>
+            <p class="status" id="vault1Status"></p>
+        </div>
+    </div>
+
+    <div class="overlay" id="vaultBModal" aria-modal="true" role="dialog">
+        <div class="modal">
+            <h2>Drawer Lock Challenge</h2>
+            <p>Sequence: 3, 7, 15, 31, ?</p>
+            <input id="vault2Input" type="text" autocomplete="off" placeholder="Next number" />
+            <div class="row">
+                <button class="btn" id="vault2Submit" type="button">Unlock Vault B</button>
+                <button class="btn ghost" id="hint2Btn" type="button">Hint</button>
+                <button class="btn ghost" data-close-modal="vaultBModal" type="button">Close</button>
+            </div>
+            <p class="status" id="vault2Status"></p>
+        </div>
+    </div>
+
+    <div class="overlay" id="vaultCModal" aria-modal="true" role="dialog">
+        <div class="modal">
+            <h2>Briefcase Binary Challenge</h2>
+            <p>Compute in binary then enter decimal: 101101 + 001011</p>
+            <input id="vault3Input" type="text" autocomplete="off" placeholder="Decimal result" />
+            <div class="row">
+                <button class="btn" id="vault3Submit" type="button">Unlock Vault C</button>
+                <button class="btn ghost" id="hint3Btn" type="button">Hint</button>
+                <button class="btn ghost" data-close-modal="vaultCModal" type="button">Close</button>
+            </div>
+            <p class="status" id="vault3Status"></p>
+        </div>
+    </div>
+
+    <main class="shell">
+        <section class="panel top">
+            <p class="eyebrow">Room 1 Of 11</p>
+            <h1>Front Door Foyer</h1>
+            <p class="lead">
+                Click a normal room object to inspect it. Each object hides one vault challenge. Solve all three and fill all keyholes to open the exit door.
+            </p>
+        </section>
+
+        <section class="layout">
+            <article class="panel scene">
+                <div class="keys-strip">
+                    <strong>Keys Needed:</strong>
+                    <span class="key-chip" id="key1Chip">Vault A Key</span>
+                    <span class="key-chip" id="key2Chip">Vault B Key</span>
+                    <span class="key-chip" id="key3Chip">Vault C Key</span>
+                    <span class="key-chip" id="doorChip">Exit Door Locked</span>
+                </div>
+
+                <div class="room-shell" id="roomShell">
+                    <div class="window"></div>
+                    <div class="painting"></div>
+                    <div class="sofa"></div>
+                    <div class="table"></div>
+
+                    <button class="object vault" id="objVault" type="button">
+                        Vault
+                        <span class="obj-tag">Click to inspect</span>
+                    </button>
+
+                    <button class="object drawer" id="objDrawer" type="button">
+                        Drawer
+                        <span class="obj-tag">Click to inspect</span>
+                    </button>
+
+                    <button class="object bag" id="objBag" type="button">
+                        Briefcase
+                        <span class="obj-tag">Click to inspect</span>
+                    </button>
+
+                    <div class="door-frame">
+                        <div class="door-panel">
+                            <div class="keyhole" id="hole1"></div>
+                            <div class="keyhole" id="hole2"></div>
+                            <div class="keyhole" id="hole3"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="notes" id="notesPanel">
+                    <p><strong>Room Notes:</strong> Click vault, drawer, or briefcase. Order does not matter.</p>
+                </section>
+
+                <p class="global-status" id="globalStatus"></p>
+                <div class="nav">
+                    <a class="btn ghost" href="home.html">Back To Home</a>
+                    <a class="btn ghost" href="room2.html" id="room2Link" style="display:none;">Enter Room 2</a>
+                </div>
+            </article>
+
+            <aside class="panel meta">
+                <h2>Session Stats</h2>
+                <ul class="stats">
+                    <li><strong>Player</strong><span id="playerName">Explorer</span></li>
+                    <li><strong>Rank</strong><span id="rank">Beginner</span></li>
+                    <li><strong>Points</strong><span id="points">0</span></li>
+                    <li><strong>Clues</strong><span id="clues">0</span></li>
+                    <li><strong>Hints Left</strong><span id="hints">3</span></li>
+                    <li><strong>Attempts</strong><span id="attempts">0</span></li>
+                </ul>
+
+                <h2>Room Rules</h2>
+                <div class="rules">
+                    <p>1. Click an object to open its challenge popup.</p>
+                    <p>2. You can solve any object challenge in any order.</p>
+                    <p>3. Each solved challenge inserts one key into a keyhole.</p>
+                    <p>4. All 3 keyholes must be filled to unlock Room 2.</p>
+                </div>
+            </aside>
+        </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script>
+        (function () {
+            const STORAGE_PROGRESS_KEY = "escapeProgress";
+            const STORAGE_ROOM_KEY = "roomProgress";
+            const ROOM_NUMBER = 1;
+
+            const room2Link = document.getElementById("room2Link");
+            const globalStatus = document.getElementById("globalStatus");
+            const notesPanel = document.getElementById("notesPanel");
+
+            const hole1 = document.getElementById("hole1");
+            const hole2 = document.getElementById("hole2");
+            const hole3 = document.getElementById("hole3");
+
+            const key1Chip = document.getElementById("key1Chip");
+            const key2Chip = document.getElementById("key2Chip");
+            const key3Chip = document.getElementById("key3Chip");
+            const doorChip = document.getElementById("doorChip");
+
+            const objVault = document.getElementById("objVault");
+            const objDrawer = document.getElementById("objDrawer");
+            const objBag = document.getElementById("objBag");
+
+            const vaultAModal = document.getElementById("vaultAModal");
+            const vaultBModal = document.getElementById("vaultBModal");
+            const vaultCModal = document.getElementById("vaultCModal");
+
+            const vault1Status = document.getElementById("vault1Status");
+            const vault2Status = document.getElementById("vault2Status");
+            const vault3Status = document.getElementById("vault3Status");
+
+            const playerNameEl = document.getElementById("playerName");
+            const rankEl = document.getElementById("rank");
+            const pointsEl = document.getElementById("points");
+            const cluesEl = document.getElementById("clues");
+            const hintsEl = document.getElementById("hints");
+            const attemptsEl = document.getElementById("attempts");
+
+            const dialogPopup = document.getElementById("dialogPopup");
+            const dialogMessage = document.getElementById("dialogMessage");
+            const dialogOkBtn = document.getElementById("dialogOkBtn");
+            const bossAvatar = document.getElementById("bossAvatar");
+
+            const uiState = {
+                solved: { v1: false, v2: false, v3: false },
+                attempts: 0,
+                usedHints: { v1: false, v2: false, v3: false }
+            };
+
+            function normalize(value) {
+                return String(value || "").trim().replace(/\s+/g, " ").toUpperCase();
+            }
+
+            function compact(value) {
+                return normalize(value).replace(/\s+/g, "");
+            }
+
+            function digits(value) {
+                return compact(value).replace(/[^0-9]/g, "");
+            }
+
+            function readJson(key, fallback) {
+                try {
+                    const raw = localStorage.getItem(key);
+                    if (!raw) return fallback;
+                    const parsed = JSON.parse(raw);
+                    return parsed && typeof parsed === "object" ? parsed : fallback;
+                } catch (error) {
+                    return fallback;
+                }
+            }
+
+            const progress = {
+                playerName: "Explorer",
+                avatar: "🕵️",
+                rank: "Beginner",
+                points: 0,
+                clues: 0,
+                hintsLeft: 3,
+                maxUnlockedRoom: 1,
+                ...readJson(STORAGE_PROGRESS_KEY, {})
+            };
+
+            const allRoomProgress = readJson(STORAGE_ROOM_KEY, {});
+            const roomKey = "room" + ROOM_NUMBER;
+            const savedRoom = allRoomProgress[roomKey] || {};
+
+            if (savedRoom.solved && typeof savedRoom.solved === "object") {
+                uiState.solved = { ...uiState.solved, ...savedRoom.solved };
+            }
+            if (Number.isFinite(savedRoom.attempts)) {
+                uiState.attempts = Math.max(0, savedRoom.attempts);
+            }
+            if (savedRoom.usedHints && typeof savedRoom.usedHints === "object") {
+                uiState.usedHints = { ...uiState.usedHints, ...savedRoom.usedHints };
+            }
+            if (savedRoom.completed === true) {
+                uiState.solved.v1 = true;
+                uiState.solved.v2 = true;
+                uiState.solved.v3 = true;
+            }
+
+            function openModal(modalEl) {
+                modalEl.classList.add("show");
+            }
+
+            function closeModal(modalEl) {
+                modalEl.classList.remove("show");
+            }
+
+            function saveState() {
+                localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
+                allRoomProgress[roomKey] = {
+                    solved: uiState.solved,
+                    completed: isAllSolved(),
+                    attempts: uiState.attempts,
+                    usedHints: uiState.usedHints,
+                    updatedAt: new Date().toISOString()
+                };
+                localStorage.setItem(STORAGE_ROOM_KEY, JSON.stringify(allRoomProgress));
+            }
+
+            function showBossMessage(text) {
+                bossAvatar.textContent = progress.avatar || "🤖";
+                dialogMessage.textContent = text;
+                openModal(dialogPopup);
+            }
+
+            dialogOkBtn.addEventListener("click", function () {
+                closeModal(dialogPopup);
+            });
+
+            [dialogPopup, vaultAModal, vaultBModal, vaultCModal].forEach(function (modal) {
+                modal.addEventListener("click", function (event) {
+                    if (event.target === modal) {
+                        closeModal(modal);
+                    }
+                });
+            });
+
+            document.querySelectorAll("[data-close-modal]").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    const target = document.getElementById(btn.getAttribute("data-close-modal"));
+                    if (target) closeModal(target);
+                });
+            });
+
+            function setStatus(el, text, ok) {
+                el.textContent = text;
+                el.className = "status " + (ok ? "ok" : "bad");
+            }
+
+            function refreshStats() {
+                playerNameEl.textContent = progress.playerName || "Explorer";
+                rankEl.textContent = progress.rank || "Beginner";
+                pointsEl.textContent = String(Math.max(0, Number(progress.points) || 0));
+                cluesEl.textContent = String(Math.max(0, Number(progress.clues) || 0));
+                hintsEl.textContent = String(Math.max(0, Number(progress.hintsLeft) || 0));
+                attemptsEl.textContent = String(uiState.attempts);
+            }
+
+            function addNote(text) {
+                const note = document.createElement("p");
+                note.textContent = text;
+                notesPanel.appendChild(note);
+            }
+
+            function spendMistakePenalty() {
+                uiState.attempts += 1;
+                progress.points = Math.max(0, (Number(progress.points) || 0) - 10);
+                refreshStats();
+                saveState();
+            }
+
+            function consumeHint(vaultKey) {
+                if (uiState.usedHints[vaultKey]) return true;
+                const left = Number(progress.hintsLeft) || 0;
+                if (left <= 0) {
+                    showBossMessage("Battery is almost gone. No hint calls left.");
+                    return false;
+                }
+                progress.hintsLeft = left - 1;
+                uiState.usedHints[vaultKey] = true;
+                refreshStats();
+                saveState();
+                return true;
+            }
+
+            function isAllSolved() {
+                return uiState.solved.v1 && uiState.solved.v2 && uiState.solved.v3;
+            }
+
+            function animateKeyhole(holeEl) {
+                holeEl.classList.add("filled");
+                if (window.gsap) {
+                    gsap.fromTo(holeEl, { scale: 0.6 }, { scale: 1, duration: 0.32, ease: "back.out(2)" });
+                }
+            }
+
+            function markObjectSolved(objEl) {
+                objEl.classList.add("solved");
+                if (window.gsap) {
+                    gsap.to(objEl, { duration: 0.2, scale: 1.03, yoyo: true, repeat: 1 });
+                }
+            }
+
+            function updateKeyUI() {
+                key1Chip.classList.toggle("found", uiState.solved.v1);
+                key2Chip.classList.toggle("found", uiState.solved.v2);
+                key3Chip.classList.toggle("found", uiState.solved.v3);
+
+                if (uiState.solved.v1) {
+                    animateKeyhole(hole1);
+                    markObjectSolved(objVault);
+                }
+                if (uiState.solved.v2) {
+                    animateKeyhole(hole2);
+                    markObjectSolved(objDrawer);
+                }
+                if (uiState.solved.v3) {
+                    animateKeyhole(hole3);
+                    markObjectSolved(objBag);
+                }
+
+                if (isAllSolved()) {
+                    doorChip.textContent = "Exit Door Unlocked";
+                    doorChip.classList.add("found");
+                    room2Link.style.display = "inline-flex";
+                } else {
+                    doorChip.textContent = "Exit Door Locked";
+                    doorChip.classList.remove("found");
+                    room2Link.style.display = "none";
+                }
+            }
+
+            function finalizeRoom1IfNeeded() {
+                if (!isAllSolved()) return;
+
+                progress.maxUnlockedRoom = Math.max(2, Number(progress.maxUnlockedRoom) || 1);
+                progress.points = Math.max(0, Number(progress.points) || 0) + 170;
+                progress.clues = Math.max(0, Number(progress.clues) || 0) + 3;
+                if ((Number(progress.points) || 0) >= 250) {
+                    progress.rank = "Foyer Solver";
+                }
+
+                updateKeyUI();
+                saveState();
+                refreshStats();
+                globalStatus.textContent = "All three keys inserted. Exit door unlocked for Room 2.";
+            }
+
+            function bindObjectInteractions() {
+                objVault.addEventListener("click", function () {
+                    openModal(vaultAModal);
+                });
+
+                objDrawer.addEventListener("click", function () {
+                    openModal(vaultBModal);
+                });
+
+                objBag.addEventListener("click", function () {
+                    openModal(vaultCModal);
+                });
+            }
+
+            function bindPuzzleEvents() {
+                document.getElementById("vault1Submit").addEventListener("click", function () {
+                    if (uiState.solved.v1) return;
+                    if (digits(document.getElementById("vault1Input").value) === "25") {
+                        uiState.solved.v1 = true;
+                        setStatus(vault1Status, "Vault A solved. Key inserted.", true);
+                        addNote("Note from vault: Drawer sequence might follow x2+1.");
+                        updateKeyUI();
+                        finalizeRoom1IfNeeded();
+                        saveState();
+                        return;
+                    }
+                    spendMistakePenalty();
+                    setStatus(vault1Status, "Wrong code. Decode ROT13 and evaluate 5^4.", false);
+                });
+
+                document.getElementById("vault2Submit").addEventListener("click", function () {
+                    if (uiState.solved.v2) return;
+                    if (digits(document.getElementById("vault2Input").value) === "63") {
+                        uiState.solved.v2 = true;
+                        setStatus(vault2Status, "Vault B solved. Key inserted.", true);
+                        addNote("Note from drawer: Binary sum needed for briefcase.");
+                        updateKeyUI();
+                        finalizeRoom1IfNeeded();
+                        saveState();
+                        return;
+                    }
+                    spendMistakePenalty();
+                    setStatus(vault2Status, "Wrong number. Sequence rule is x2 + 1.", false);
+                });
+
+                document.getElementById("vault3Submit").addEventListener("click", function () {
+                    if (uiState.solved.v3) return;
+                    if (digits(document.getElementById("vault3Input").value) === "56") {
+                        uiState.solved.v3 = true;
+                        setStatus(vault3Status, "Vault C solved. Key inserted.", true);
+                        addNote("Note from briefcase: All keyholes filled unlock the exit.");
+                        updateKeyUI();
+                        finalizeRoom1IfNeeded();
+                        saveState();
+                        return;
+                    }
+                    spendMistakePenalty();
+                    setStatus(vault3Status, "Wrong result. Convert binary sum to decimal.", false);
+                });
+
+                document.getElementById("hint1Btn").addEventListener("click", function () {
+                    if (!consumeHint("v1")) return;
+                    showBossMessage("Hint A: ROT13 then find last two digits of 5^4.");
+                });
+
+                document.getElementById("hint2Btn").addEventListener("click", function () {
+                    if (!consumeHint("v2")) return;
+                    showBossMessage("Hint B: Sequence doubles then adds 1.");
+                });
+
+                document.getElementById("hint3Btn").addEventListener("click", function () {
+                    if (!consumeHint("v3")) return;
+                    showBossMessage("Hint C: 101101(2)=45 and 001011(2)=11.");
+                });
+            }
+
+            function initSolvedView() {
+                if (uiState.solved.v1) {
+                    setStatus(vault1Status, "Already solved.", true);
+                }
+                if (uiState.solved.v2) {
+                    setStatus(vault2Status, "Already solved.", true);
+                }
+                if (uiState.solved.v3) {
+                    setStatus(vault3Status, "Already solved.", true);
+                }
+                if (isAllSolved()) {
+                    globalStatus.textContent = "Room 1 already complete. Proceed to Room 2.";
+                }
+            }
+
+            function runAmbientAnimation() {
+                if (!window.gsap) return;
+                gsap.to(".painting", { duration: 5, rotation: 1.2, transformOrigin: "50% 0%", repeat: -1, yoyo: true, ease: "sine.inOut" });
+                gsap.fromTo(".window", { opacity: 0.92 }, { opacity: 0.72, duration: 2.2, repeat: -1, yoyo: true, ease: "sine.inOut" });
+                gsap.fromTo(".table", { y: 0 }, { y: 2, duration: 2.8, repeat: -1, yoyo: true, ease: "sine.inOut" });
+            }
+
+            refreshStats();
+            bindObjectInteractions();
+            bindPuzzleEvents();
+            initSolvedView();
+            updateKeyUI();
+            runAmbientAnimation();
+            saveState();
+
+            const introName = progress.playerName || "XYZ";
+            showBossMessage("Hey " + introName + ". Click the vault, drawer, or briefcase to inspect them. Each solved challenge inserts one key into the door.");
+        })();
+    </script>
+</body>
+</html>

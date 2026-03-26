@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WayGG | House Break</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-0: #080f1e;
+            --bg-1: #142740;
+            --bg-2: #224866;
+            --panel: rgba(10, 18, 35, 0.76);
+            --line: rgba(171, 217, 255, 0.24);
+            --ink: #f2fbff;
+            --muted: #b8cfde;
+            --accent: #f6c56f;
+            --accent-2: #88f1da;
+            --ok: #88f1da;
+            --warn: #ffd296;
+            --danger: #ff9ea0;
+            --locked: rgba(255, 255, 255, 0.09);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            font-family: "Manrope", "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 13% 10%, #2b5883 0%, transparent 35%),
+                radial-gradient(circle at 84% 80%, #2a5a60 0%, transparent 35%),
+                linear-gradient(145deg, var(--bg-0), var(--bg-1) 56%, var(--bg-2));
+            padding: 20px;
+        }
+
+        .shell {
+            width: min(1180px, 100%);
+            margin: 0 auto;
+            display: grid;
+            gap: 16px;
+            animation: rise 0.55s ease;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+            backdrop-filter: blur(8px);
+        }
+
+        .hero {
+            padding: 22px;
+            display: grid;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            right: -120px;
+            top: -140px;
+            pointer-events: none;
+            background: radial-gradient(circle, rgba(246, 197, 111, 0.29), transparent 72%);
+        }
+
+        .eyebrow {
+            color: var(--accent-2);
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            font-weight: 700;
+            font-size: 0.78rem;
+        }
+
+        h1 {
+            font-family: "Cinzel", Georgia, serif;
+            line-height: 1.08;
+            font-size: clamp(2rem, 4.8vw, 3.4rem);
+            letter-spacing: 0.04em;
+        }
+
+        .hero p {
+            color: var(--muted);
+            max-width: 74ch;
+            line-height: 1.6;
+        }
+
+        .boss-scene {
+            margin-top: 6px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.03);
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 10px;
+            padding: 10px;
+            align-items: center;
+            min-height: 88px;
+        }
+
+        .boss-sprite {
+            width: 58px;
+            height: 58px;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--line);
+            font-size: 1.8rem;
+        }
+
+        .boss-dialogue {
+            color: var(--warn);
+            font-size: 0.92rem;
+            line-height: 1.5;
+            opacity: 0;
+            transform: translateY(6px);
+            animation: reveal 0.4s ease forwards;
+        }
+
+        .hero-strip {
+            margin-top: 4px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 11px 12px;
+        }
+
+        .hero-strip p {
+            margin: 0;
+            max-width: none;
+            color: var(--warn);
+            font-size: 0.9rem;
+        }
+
+        .cta-row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+        .btn {
+            border: 0;
+            border-radius: 999px;
+            padding: 11px 16px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s ease, filter 0.2s ease;
+            color: #102130;
+            background: linear-gradient(130deg, var(--accent), #ffe3ab);
+        }
+
+        .btn.alt { background: linear-gradient(130deg, var(--accent-2), #c4fff1); }
+        .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.05); }
+
+        .status {
+            min-height: 1.3em;
+            font-size: 0.9rem;
+            color: var(--warn);
+        }
+
+        .layout {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: 1.5fr 1fr;
+        }
+
+        .map-wrap,
+        .side { padding: 18px; }
+
+        .section-title {
+            font-family: "Cinzel", Georgia, serif;
+            margin-bottom: 10px;
+            font-size: 1.24rem;
+            letter-spacing: 0.04em;
+        }
+
+        .house-map {
+            position: relative;
+            border: 1px solid var(--line);
+            border-radius: 0;
+            min-height: 560px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 0;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 30%),
+                repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 30px),
+                repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.015) 0 1px, transparent 1px 30px);
+            overflow: hidden;
+        }
+
+        .room-node {
+            position: relative;
+            min-height: 150px;
+            border-radius: 0;
+            border: 1px solid rgba(155, 197, 229, 0.55);
+            background: var(--locked);
+            color: var(--ink);
+            text-decoration: none;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            padding: 8px;
+            transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+            animation: pop-in 0.45s ease both;
+        }
+
+        .room-label {
+            display: grid;
+            gap: 2px;
+            justify-items: center;
+            z-index: 2;
+        }
+
+        .room-node strong { font-size: 0.95rem; }
+        .room-node small { color: var(--muted); font-size: 0.73rem; }
+
+        .door-marker {
+            position: absolute;
+            background: rgba(138, 241, 218, 0.9);
+            z-index: 3;
+        }
+
+        .door-marker.left,
+        .door-marker.right {
+            width: 8px;
+            height: 42%;
+            top: 29%;
+        }
+
+        .door-marker.left { left: -4px; }
+        .door-marker.right { right: -4px; }
+
+        .door-marker.top,
+        .door-marker.bottom {
+            height: 8px;
+            width: 42%;
+            left: 29%;
+        }
+
+        .door-marker.top { top: -4px; }
+        .door-marker.bottom { bottom: -4px; }
+
+        .door-marker.entry {
+            width: 12px;
+            height: 56%;
+            top: 22%;
+            left: 8px;
+            background: rgba(246, 197, 111, 0.95);
+            border-left: 2px solid rgba(255, 239, 197, 0.9);
+            border-right: 2px solid rgba(255, 239, 197, 0.9);
+        }
+
+        .room-node.unlocked {
+            background: linear-gradient(160deg, rgba(136, 241, 218, 0.22), rgba(246, 197, 111, 0.16));
+            border-color: rgba(136, 241, 218, 0.52);
+        }
+
+        .room-node.unlocked:hover {
+            transform: translateY(-3px) scale(1.01);
+            background: linear-gradient(160deg, rgba(136, 241, 218, 0.34), rgba(246, 197, 111, 0.26));
+        }
+
+        .room-node.locked {
+            opacity: 0.66;
+            cursor: not-allowed;
+        }
+
+        .room-node.empty {
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .side-stack { display: grid; gap: 12px; }
+
+        .identity-card {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 12px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .identity-top {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .avatar-badge {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--line);
+            font-size: 1.4rem;
+        }
+
+        .kpi { display: grid; gap: 8px; }
+        .kpi div {
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 9px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .kpi span { color: var(--accent); font-weight: 700; }
+
+        .story-feed {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 12px;
+            display: grid;
+            gap: 8px;
+            min-height: 154px;
+        }
+
+        .story-feed p {
+            color: var(--muted);
+            font-size: 0.89rem;
+            line-height: 1.5;
+            opacity: 0;
+            transform: translateY(6px);
+            animation: reveal 0.4s ease forwards;
+        }
+
+        .rules {
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.52;
+            display: grid;
+            gap: 7px;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.82rem;
+            opacity: 0.88;
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(1, 5, 12, 0.76);
+            backdrop-filter: blur(6px);
+            display: none;
+            place-items: center;
+            z-index: 40;
+            padding: 14px;
+        }
+
+        .overlay.show { display: grid; }
+
+        .modal {
+            width: min(680px, 100%);
+            background: #0e1d31;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            box-shadow: 0 18px 34px rgba(0, 0, 0, 0.4);
+            padding: 18px;
+            display: grid;
+            gap: 12px;
+            animation: rise 0.3s ease;
+        }
+
+        .modal h2 {
+            font-family: "Cinzel", Georgia, serif;
+            font-size: 1.42rem;
+            letter-spacing: 0.03em;
+        }
+
+        .modal p { color: var(--muted); line-height: 1.6; font-size: 0.92rem; }
+
+        .field {
+            display: grid;
+            gap: 7px;
+        }
+
+        .field label {
+            font-size: 0.83rem;
+            color: var(--accent-2);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 700;
+        }
+
+        .field input {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 10px 12px;
+            background: rgba(1, 8, 18, 0.64);
+            color: var(--ink);
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .field input:focus { border-color: var(--accent-2); }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(48px, 1fr));
+            gap: 8px;
+        }
+
+        .avatar-option {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            min-height: 48px;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            font-size: 1.45rem;
+            cursor: pointer;
+            transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+        }
+
+        .avatar-option:hover { transform: translateY(-1px); border-color: var(--accent-2); }
+        .avatar-option.active { border-color: var(--accent); background: rgba(246, 197, 111, 0.2); }
+
+        .modal-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pop-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes reveal { to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 980px) {
+            .layout { grid-template-columns: 1fr; }
+            .house-map { min-height: 640px; }
+        }
+
+        @media (max-width: 560px) {
+            body { padding: 10px; }
+            .hero, .map-wrap, .side { padding: 14px; }
+            .btn { width: 100%; text-align: center; }
+            .hero-strip { grid-template-columns: 1fr; }
+            .avatar-grid { grid-template-columns: repeat(4, minmax(48px, 1fr)); }
+            .house-map { min-height: 720px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="onboardingOverlay" aria-modal="true" role="dialog">
+        <div class="modal">
+            <h2>Mission Setup</h2>
+            <p>
+                Before entering the house, identify yourself. Your boss sent you for a detective mission,
+                but the door shut behind you. Phone battery is low: you can call your boss for help only 5 times.
+            </p>
+            <div class="field">
+                <label for="nameInput">Detective Name</label>
+                <input id="nameInput" type="text" maxlength="18" placeholder="Enter your name" autocomplete="off" />
+            </div>
+            <div class="field">
+                <label>Choose Avatar</label>
+                <div class="avatar-grid" id="avatarGrid"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn" type="button" id="startMissionBtn" disabled>Start Mission</button>
+                <button class="btn ghost" type="button" id="skipMissionBtn">Use Existing Save</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="shell">
+        <section class="panel hero">
+            <p class="eyebrow">Story Escape Adventure</p>
+            <h1>House Break</h1>
+            <p>
+                You are detective <strong id="heroPlayerName">XYZ</strong>. Your boss says this house is a trap.
+                Move through connected rooms, solve every lock, and escape through Room 11.
+            </p>
+            <div class="boss-scene">
+                <div class="boss-sprite" aria-hidden="true">🤖</div>
+                <p class="boss-dialogue" id="bossDialogue"></p>
+            </div>
+            <div class="hero-strip">
+                <p id="batteryText">Phone Battery Critical: boss calls available 5/5.</p>
+                <button class="btn ghost" id="callBossBtn" type="button">Call Boss For Hint</button>
+            </div>
+            <div class="cta-row">
+                <a class="btn" id="newGameBtn" href="room1.html">Start From Room 1</a>
+                <a class="btn alt" id="continueBtn" href="room1.html">Continue</a>
+                <button class="btn ghost" id="resetBtn" type="button">Reset Run</button>
+            </div>
+            <p class="status" id="statusText"></p>
+        </section>
+
+        <section class="layout">
+            <article class="panel map-wrap">
+                <h2 class="section-title">Connected House Map</h2>
+                <div class="house-map" id="houseMap"></div>
+            </article>
+
+            <aside class="panel side">
+                <h2 class="section-title">Mission Console</h2>
+                <div class="side-stack">
+                    <section class="identity-card">
+                        <div class="identity-top">
+                            <div class="avatar-badge" id="avatarBadge">🕵️</div>
+                            <div>
+                                <p><strong id="playerName">Detective</strong></p>
+                                <p style="color: var(--muted); font-size: 0.88rem;" id="playerRole">Field Agent</p>
+                            </div>
+                        </div>
+                        <div class="kpi">
+                            <div><strong>Rank</strong><span id="rank">Beginner</span></div>
+                            <div><strong>Points</strong><span id="points">0</span></div>
+                            <div><strong>Clues</strong><span id="clues">0</span></div>
+                            <div><strong>Room Access</strong><span id="maxRoom">1</span></div>
+                            <div><strong>Boss Calls Left</strong><span id="bossCalls">5</span></div>
+                        </div>
+                    </section>
+
+                    <section class="story-feed" id="storyFeed"></section>
+
+                    <section class="rules">
+                        <p>1. This is a connected house, each room leads to the next.</p>
+                        <p>2. You can call your boss for hint at most 5 times in one run.</p>
+                        <p>3. Reach Room 11 and unlock the outside gate to win.</p>
+                    </section>
+                </div>
+            </aside>
+        </section>
+
+        <footer>House Break | Story Mode: Detective Escape From Home</footer>
+    </main>
+
+    <script>
+        (function () {
+            const ROOM_COUNT = 11;
+            const STORAGE_PROGRESS_KEY = "escapeProgress";
+            const LEGACY_KEYS = ["wayggProgress", "maxUnlockedRoom", "roomUnlocked"];
+            const AVATARS = ["🕵️", "🧠", "🛡️", "🧭", "🧪", "🛰️", "🦊", "🦉", "🐺", "🐯", "🐲", "⚡"];
+
+            const ROOM_LAYOUT = [
+                { n: 1, row: 1, col: 1, doors: ["bottom"] },
+                { n: 2, row: 2, col: 1, doors: ["bottom"] },
+                { n: 3, row: 3, col: 1, doors: ["right"] },
+                { n: 4, row: 3, col: 2, doors: ["top"] },
+                { n: 5, row: 2, col: 2, doors: ["top"] },
+                { n: 6, row: 1, col: 2, doors: ["right"] },
+                { n: 7, row: 1, col: 3, doors: [ "right"] },
+                { n: 8, row: 1, col: 4, doors: ["bottom"] },
+                { n: 9, row: 2, col: 4, doors: [ "left"] },
+                { n: 10, row: 2, col: 3, doors: ["bottom"] },
+                { n: 11, row: 3, col: 3, doors: ["right"] }
+            ];
+            // const ROOM_LAYOUT = [
+            //     { n: 1, row: 1, col: 1, doors: ["right", "bottom", "entry"] },
+            //     { n: 2, row: 1, col: 2, doors: ["left", "right", "bottom"] },
+            //     { n: 3, row: 1, col: 3, doors: ["left", "right", "bottom"] },
+            //     { n: 4, row: 1, col: 4, doors: ["left", "bottom"] },
+            //     { n: 5, row: 2, col: 1, doors: ["top", "right", "bottom"] },
+            //     { n: 6, row: 2, col: 2, doors: ["top", "left", "right", "bottom"] },
+            //     { n: 7, row: 2, col: 3, doors: ["top", "left", "right", "bottom"] },
+            //     { n: 8, row: 2, col: 4, doors: ["top", "left"] },
+            //     { n: 9, row: 3, col: 1, doors: ["top", "right"] },
+            //     { n: 10, row: 3, col: 2, doors: ["top", "left", "right"] },
+            //     { n: 11, row: 3, col: 3, doors: ["top", "left", "right"] }
+            // ];
+
+            const BOSS_HINTS = [
+                "Boss: Stay calm. Start from Room 1 and never skip sequence clues.",
+                "Boss: Note patterns in each room title and puzzle order. They matter.",
+                "Boss: Wrong attempts cost points, so verify before submitting answers.",
+                "Boss: Save hints for hard rooms like 8, 10, and 11.",
+                "Boss: Final reminder, Room 11 outside gate ends the whole game."
+            ];
+
+            const onboardingOverlay = document.getElementById("onboardingOverlay");
+            const nameInput = document.getElementById("nameInput");
+            const avatarGrid = document.getElementById("avatarGrid");
+            const startMissionBtn = document.getElementById("startMissionBtn");
+            const skipMissionBtn = document.getElementById("skipMissionBtn");
+
+            const houseMap = document.getElementById("houseMap");
+            const continueBtn = document.getElementById("continueBtn");
+            const newGameBtn = document.getElementById("newGameBtn");
+            const resetBtn = document.getElementById("resetBtn");
+            const callBossBtn = document.getElementById("callBossBtn");
+            const statusText = document.getElementById("statusText");
+            const storyFeed = document.getElementById("storyFeed");
+            const bossDialogue = document.getElementById("bossDialogue");
+
+            const heroPlayerName = document.getElementById("heroPlayerName");
+            const batteryText = document.getElementById("batteryText");
+            const avatarBadge = document.getElementById("avatarBadge");
+            const playerName = document.getElementById("playerName");
+            const rank = document.getElementById("rank");
+            const points = document.getElementById("points");
+            const clues = document.getElementById("clues");
+            const maxRoom = document.getElementById("maxRoom");
+            const bossCalls = document.getElementById("bossCalls");
+
+            let selectedAvatar = "";
+
+            function clampRoom(value) {
+                const n = Number(value);
+                if (!Number.isFinite(n)) return 1;
+                return Math.max(1, Math.min(ROOM_COUNT, Math.floor(n)));
+            }
+
+            function normalizeName(value) {
+                const v = String(value || "").trim().replace(/\s+/g, " ");
+                return v.slice(0, 18);
+            }
+
+            function readProgress() {
+                let progress = {
+                    playerName: "",
+                    avatar: "",
+                    rank: "Beginner",
+                    points: 0,
+                    clues: 0,
+                    hintsLeft: 3,
+                    maxUnlockedRoom: 1,
+                    bossCallsLeft: 5
+                };
+
+                try {
+                    const raw = localStorage.getItem(STORAGE_PROGRESS_KEY);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        progress = {
+                            ...progress,
+                            ...parsed,
+                            maxUnlockedRoom: clampRoom(parsed.maxUnlockedRoom),
+                            bossCallsLeft: Math.max(0, Math.min(5, Number(parsed.bossCallsLeft ?? 5)))
+                        };
+                        return progress;
+                    }
+                } catch (error) {
+                    statusText.textContent = "Saved data was corrupted. Safe defaults loaded.";
+                }
+
+                for (const key of LEGACY_KEYS) {
+                    const value = localStorage.getItem(key);
+                    if (value !== null) {
+                        progress.maxUnlockedRoom = clampRoom(value);
+                        break;
+                    }
+                }
+
+                return progress;
+            }
+
+            function saveProgress(progress) {
+                localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
+            }
+
+            function addStoryLine(text) {
+                const p = document.createElement("p");
+                p.textContent = text;
+                p.style.animationDelay = storyFeed.children.length * 80 + "ms";
+                storyFeed.appendChild(p);
+            }
+
+            function renderStoryIntro(progress) {
+                storyFeed.innerHTML = "";
+                const name = progress.playerName || "XYZ";
+                const lines = [
+                    "[Mission Log] Boss assigned you to investigate this locked house.",
+                    "[Mission Log] " + name + " entered for evidence search.",
+                    "[Mission Log] Main door auto-locked. You are trapped inside.",
+                    "[Mission Log] Phone battery is critical, only five calls can be made.",
+                    "[Mission Log] Route marked: Room 1 -> Room 11 -> Outside Gate."
+                ];
+
+                lines.forEach(function (line, index) {
+                    setTimeout(function () { addStoryLine(line); }, index * 220);
+                });
+            }
+
+            function renderBossBrief(progress) {
+                const name = progress.playerName || "XYZ";
+                const lines = [
+                    "Hey " + name + ", this is your boss. You were sent for a detective mission.",
+                    "You are stuck inside this house and every room is connected to the next.",
+                    "Your phone battery is low, call me only when needed.",
+                    "You can contact me at max 5 times for help.",
+                    "Escape from Room 11 to win. Move now."
+                ];
+
+                let idx = 0;
+                bossDialogue.textContent = lines[idx];
+                const timer = setInterval(function () {
+                    idx += 1;
+                    if (idx >= lines.length) {
+                        clearInterval(timer);
+                        return;
+                    }
+                    bossDialogue.style.opacity = "0";
+                    bossDialogue.style.transform = "translateY(6px)";
+                    setTimeout(function () {
+                        bossDialogue.textContent = lines[idx];
+                        bossDialogue.style.opacity = "1";
+                        bossDialogue.style.transform = "translateY(0)";
+                    }, 140);
+                }, 2200);
+            }
+
+            function renderAvatarPicker() {
+                avatarGrid.innerHTML = "";
+                AVATARS.forEach(function (icon) {
+                    const option = document.createElement("button");
+                    option.type = "button";
+                    option.className = "avatar-option";
+                    option.textContent = icon;
+                    option.addEventListener("click", function () {
+                        selectedAvatar = icon;
+                        Array.from(avatarGrid.children).forEach(function (node) {
+                            node.classList.remove("active");
+                        });
+                        option.classList.add("active");
+                        validateOnboarding();
+                    });
+                    avatarGrid.appendChild(option);
+                });
+            }
+
+            function validateOnboarding() {
+                const validName = normalizeName(nameInput.value).length >= 2;
+                const validAvatar = Boolean(selectedAvatar);
+                startMissionBtn.disabled = !(validName && validAvatar);
+            }
+
+            function openOnboarding(useExistingVisible) {
+                onboardingOverlay.classList.add("show");
+                skipMissionBtn.style.display = useExistingVisible ? "inline-flex" : "none";
+                renderAvatarPicker();
+                validateOnboarding();
+            }
+
+            function closeOnboarding() {
+                onboardingOverlay.classList.remove("show");
+            }
+
+            function createRoomNode(roomNumber, unlocked) {
+                const room = ROOM_LAYOUT.find(function (item) { return item.n === roomNumber; });
+                const a = document.createElement("a");
+                a.href = "room" + roomNumber + ".html";
+                a.className = "room-node " + (unlocked ? "unlocked" : "locked");
+                a.style.gridColumn = String(room.col);
+                a.style.gridRow = String(room.row);
+                a.style.animationDelay = roomNumber * 45 + "ms";
+                a.innerHTML = "<div class=\"room-label\"><strong>Room " + roomNumber + "</strong><small>" + (unlocked ? "Unlocked" : "Locked") + "</small></div>";
+
+                (room.doors || []).forEach(function (door) {
+                    const marker = document.createElement("span");
+                    marker.className = "door-marker " + door;
+                    a.appendChild(marker);
+                });
+
+                if (!unlocked) {
+                    a.addEventListener("click", function (event) {
+                        event.preventDefault();
+                        statusText.textContent = "Room " + roomNumber + " is locked. Clear previous rooms first.";
+                    });
+                }
+
+                return a;
+            }
+
+            function renderHouseMap(progress) {
+                Array.from(houseMap.querySelectorAll(".room-node")).forEach(function (node) { node.remove(); });
+                for (let i = 1; i <= ROOM_COUNT; i += 1) {
+                    houseMap.appendChild(createRoomNode(i, i <= progress.maxUnlockedRoom));
+                }
+
+                const emptyNode = document.createElement("div");
+                emptyNode.className = "room-node empty";
+                emptyNode.style.gridColumn = "4";
+                emptyNode.style.gridRow = "3";
+                houseMap.appendChild(emptyNode);
+            }
+
+            function renderStats(progress) {
+                const name = progress.playerName || "XYZ";
+                const avatar = progress.avatar || "🕵️";
+                heroPlayerName.textContent = name;
+                playerName.textContent = name;
+                avatarBadge.textContent = avatar;
+                rank.textContent = progress.rank || "Beginner";
+                points.textContent = String(Math.max(0, Number(progress.points) || 0));
+                clues.textContent = String(Math.max(0, Number(progress.clues) || 0));
+                maxRoom.textContent = String(progress.maxUnlockedRoom || 1);
+                bossCalls.textContent = String(Math.max(0, Number(progress.bossCallsLeft) || 0));
+                batteryText.textContent = "Phone Battery Critical: boss calls available " + (progress.bossCallsLeft || 0) + "/5.";
+            }
+
+            function bindActions(progress) {
+                continueBtn.href = "room" + progress.maxUnlockedRoom + ".html";
+
+                newGameBtn.addEventListener("click", function () {
+                    const nextProgress = {
+                        ...progress,
+                        rank: "Beginner",
+                        points: 0,
+                        clues: 0,
+                        hintsLeft: 3,
+                        maxUnlockedRoom: 1,
+                        bossCallsLeft: 5,
+                        gameCompleted: false,
+                        completedAt: ""
+                    };
+                    saveProgress(nextProgress);
+                });
+
+                resetBtn.addEventListener("click", function () {
+                    const isConfirmed = window.confirm("Reset all progress and restart this house escape from Room 1?");
+                    if (!isConfirmed) return;
+
+                    localStorage.removeItem(STORAGE_PROGRESS_KEY);
+                    localStorage.removeItem("roomProgress");
+                    LEGACY_KEYS.forEach(function (key) { localStorage.removeItem(key); });
+                    window.location.reload();
+                });
+
+                callBossBtn.addEventListener("click", function () {
+                    const callsLeft = Math.max(0, Number(progress.bossCallsLeft) || 0);
+                    if (callsLeft <= 0) {
+                        statusText.textContent = "Battery drained. No boss calls left.";
+                        callBossBtn.disabled = true;
+                        return;
+                    }
+
+                    const used = 5 - callsLeft;
+                    const hint = BOSS_HINTS[Math.min(used, BOSS_HINTS.length - 1)];
+                    addStoryLine(hint);
+
+                    progress.bossCallsLeft = callsLeft - 1;
+                    saveProgress(progress);
+                    renderStats(progress);
+                    statusText.textContent = "Boss call connected. Remaining calls: " + progress.bossCallsLeft + ".";
+
+                    if (progress.bossCallsLeft <= 0) {
+                        callBossBtn.disabled = true;
+                    }
+                });
+            }
+
+            function init() {
+                const progress = readProgress();
+
+                const hasIdentity = normalizeName(progress.playerName).length >= 2 && Boolean(progress.avatar);
+                if (!hasIdentity) {
+                    openOnboarding(hasIdentity);
+                }
+
+                nameInput.addEventListener("input", validateOnboarding);
+
+                startMissionBtn.addEventListener("click", function () {
+                    progress.playerName = normalizeName(nameInput.value);
+                    progress.avatar = selectedAvatar;
+                    if (!Number.isFinite(Number(progress.bossCallsLeft))) {
+                        progress.bossCallsLeft = 5;
+                    }
+                    saveProgress(progress);
+                    closeOnboarding();
+                    renderStats(progress);
+                    renderHouseMap(progress);
+                    renderStoryIntro(progress);
+                    renderBossBrief(progress);
+                    bindActions(progress);
+                    statusText.textContent = "Mission started. Begin with Room 1.";
+                });
+
+                skipMissionBtn.addEventListener("click", function () {
+                    closeOnboarding();
+                });
+
+                renderStats(progress);
+                renderHouseMap(progress);
+                renderStoryIntro(progress);
+                renderBossBrief(progress);
+                bindActions(progress);
+
+                if (!hasIdentity) {
+                    statusText.textContent = "Set your name and avatar to start mission.";
+                } else if (!statusText.textContent) {
+                    statusText.textContent = "Latest unlocked room: Room " + progress.maxUnlockedRoom + ".";
+                }
+
+                if ((Number(progress.bossCallsLeft) || 0) <= 0) {
+                    callBossBtn.disabled = true;
+                }
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>

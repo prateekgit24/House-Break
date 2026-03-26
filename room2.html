@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WayGG | Room 2 - Hallway Pattern Lock</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-0: #0f1323;
+            --bg-1: #18253f;
+            --bg-2: #243050;
+            --panel: rgba(10, 18, 37, 0.74);
+            --line: rgba(170, 212, 255, 0.24);
+            --ink: #f2f8ff;
+            --muted: #bac9dd;
+            --accent: #ffb870;
+            --accent-2: #85f0d5;
+            --ok: #85f0d5;
+            --bad: #ff9ca0;
+            --warn: #ffd59b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "Manrope", "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 10% 12%, #2b4769 0%, transparent 34%),
+                radial-gradient(circle at 86% 78%, #284f56 0%, transparent 34%),
+                linear-gradient(140deg, var(--bg-0), var(--bg-1) 55%, var(--bg-2));
+            padding: 18px;
+        }
+
+        .shell {
+            width: min(1120px, 100%);
+            margin: 0 auto;
+            display: grid;
+            gap: 16px;
+            animation: rise 0.55s ease;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+        }
+
+        .top {
+            padding: 20px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .eyebrow {
+            color: var(--accent-2);
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        h1 {
+            font-family: "Cinzel", Georgia, serif;
+            font-size: clamp(1.8rem, 4.6vw, 3rem);
+            line-height: 1.1;
+            letter-spacing: 0.04em;
+        }
+
+        .lead {
+            color: var(--muted);
+            max-width: 68ch;
+            line-height: 1.6;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1.45fr 1fr;
+            gap: 16px;
+        }
+
+        .puzzles,
+        .meta {
+            padding: 18px;
+            display: grid;
+            gap: 12px;
+            align-content: start;
+        }
+
+        .locked-screen {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 18px;
+            color: var(--warn);
+            background: rgba(255, 255, 255, 0.04);
+            line-height: 1.5;
+        }
+
+        .challenge {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            display: grid;
+            gap: 8px;
+        }
+
+        .challenge h2 {
+            font-size: 1rem;
+        }
+
+        .challenge p {
+            color: var(--muted);
+            font-size: 0.92rem;
+            line-height: 1.45;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chip {
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 0.78rem;
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 190px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: rgba(5, 11, 24, 0.65);
+            color: var(--ink);
+            padding: 10px 12px;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-2);
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 999px;
+            padding: 10px 15px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: #152230;
+            background: linear-gradient(130deg, var(--accent), #ffe0a7);
+            transition: transform 0.2s ease, filter 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn.alt {
+            background: linear-gradient(130deg, var(--accent-2), #c1ffed);
+        }
+
+        .btn.ghost {
+            color: var(--ink);
+            background: transparent;
+            border: 1px solid var(--line);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+
+        .status {
+            min-height: 1.25em;
+            font-size: 0.9rem;
+        }
+
+        .status.ok {
+            color: var(--ok);
+        }
+
+        .status.bad {
+            color: var(--bad);
+        }
+
+        .stats {
+            display: grid;
+            gap: 8px;
+        }
+
+        .stats li {
+            list-style: none;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 10px;
+            font-size: 0.9rem;
+        }
+
+        .stats span {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .rules {
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.54;
+            display: grid;
+            gap: 6px;
+        }
+
+        .global-status {
+            min-height: 1.35em;
+            color: var(--warn);
+            font-size: 0.92rem;
+        }
+
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        @keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 560px) {
+            body {
+                padding: 10px;
+            }
+
+            .top,
+            .puzzles,
+            .meta {
+                padding: 14px;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <section class="panel top">
+            <p class="eyebrow">Room 2 Of 11</p>
+            <h1>Hallway Pattern Lock</h1>
+            <p class="lead">
+                The main hallway is full of coded wall frames. Solve each sequence to open the way to Room 3.
+            </p>
+        </section>
+
+        <section class="layout">
+            <article class="panel puzzles" id="puzzleContainer">
+                <section class="challenge" id="challenge1">
+                    <h2>Challenge 1: Height Sequence</h2>
+                    <p>4 years = 100 cm, 5 years = 110 cm, 6 years = 120 cm, 7 years = ?</p>
+                    <div class="chips">
+                        <span class="chip">Linear Growth</span>
+                        <span class="chip">Numeric Pattern</span>
+                    </div>
+                    <div class="row">
+                        <input id="heightInput" type="text" autocomplete="off" placeholder="Answer in cm" />
+                        <button class="btn" id="heightSubmit" type="button">Submit</button>
+                        <button class="btn ghost" id="hint1" type="button">Hint</button>
+                    </div>
+                    <p class="status" id="status1"></p>
+                </section>
+
+                <section class="challenge" id="challenge2">
+                    <h2>Challenge 2: Shape Rotation</h2>
+                    <p>Sequence: STAR → CIRCLE → SQUARE → ?</p>
+                    <div class="chips">
+                        <span class="chip">Use Words</span>
+                        <span class="chip">Upper/Lower Case Accepted</span>
+                    </div>
+                    <div class="row">
+                        <input id="shapeInput" type="text" autocomplete="off" placeholder="Next shape" />
+                        <button class="btn" id="shapeSubmit" type="button">Submit</button>
+                        <button class="btn ghost" id="hint2" type="button">Hint</button>
+                    </div>
+                    <p class="status" id="status2"></p>
+                </section>
+
+                <section class="challenge" id="challenge3">
+                    <h2>Challenge 3: Color Loop</h2>
+                    <p>RED → BLUE → GREEN → RED → ?</p>
+                    <div class="chips">
+                        <span class="chip">Cyclic Pattern</span>
+                    </div>
+                    <div class="row">
+                        <input id="colorInput" type="text" autocomplete="off" placeholder="Next color" />
+                        <button class="btn" id="colorSubmit" type="button">Submit</button>
+                        <button class="btn ghost" id="hint3" type="button">Hint</button>
+                    </div>
+                    <p class="status" id="status3"></p>
+                </section>
+
+                <section class="challenge" id="challenge4">
+                    <h2>Challenge 4: Final Vault Code</h2>
+                    <p>Combine answers from the first three challenges in order without spaces.</p>
+                    <div class="chips">
+                        <span class="chip">Format: Number + Word + Word</span>
+                    </div>
+                    <div class="row">
+                        <input id="finalInput" type="text" autocomplete="off" placeholder="Example: 123ABCXYZ" />
+                        <button class="btn alt" id="finalSubmit" type="button">Unlock Room 3</button>
+                        <button class="btn ghost" id="hint4" type="button">Hint</button>
+                    </div>
+                    <p class="status" id="status4"></p>
+                </section>
+
+                <p class="global-status" id="globalStatus"></p>
+                <div class="nav">
+                    <a class="btn ghost" href="home.html">Back To Home</a>
+                    <a class="btn ghost" href="room1.html">Back To Room 1</a>
+                    <a class="btn ghost" href="room3.html" id="room3Link" style="display: none;">Enter Room 3</a>
+                </div>
+            </article>
+
+            <aside class="panel meta">
+                <h2>Session Stats</h2>
+                <ul class="stats">
+                    <li><strong>Player</strong><span id="playerName">Explorer</span></li>
+                    <li><strong>Rank</strong><span id="rank">Beginner</span></li>
+                    <li><strong>Points</strong><span id="points">0</span></li>
+                    <li><strong>Clues</strong><span id="clues">0</span></li>
+                    <li><strong>Hints Left</strong><span id="hints">3</span></li>
+                    <li><strong>Attempts</strong><span id="attempts">0</span></li>
+                </ul>
+
+                <h2>Room Rules</h2>
+                <div class="rules">
+                    <p>1. Room 2 requires Room 1 completion or unlocked access from home progress.</p>
+                    <p>2. Wrong attempts reduce points by 10, minimum 0.</p>
+                    <p>3. First hint use for each challenge consumes one hint.</p>
+                    <p>4. Completing Room 2 unlocks Room 3 and grants rewards.</p>
+                </div>
+            </aside>
+        </section>
+    </main>
+
+    <script>
+        (function () {
+            const STORAGE_PROGRESS_KEY = "escapeProgress";
+            const STORAGE_ROOM_KEY = "roomProgress";
+            const ROOM_NUMBER = 2;
+
+            const puzzleContainer = document.getElementById("puzzleContainer");
+            const globalStatus = document.getElementById("globalStatus");
+            const room3Link = document.getElementById("room3Link");
+
+            const status1 = document.getElementById("status1");
+            const status2 = document.getElementById("status2");
+            const status3 = document.getElementById("status3");
+            const status4 = document.getElementById("status4");
+
+            const playerNameEl = document.getElementById("playerName");
+            const rankEl = document.getElementById("rank");
+            const pointsEl = document.getElementById("points");
+            const cluesEl = document.getElementById("clues");
+            const hintsEl = document.getElementById("hints");
+            const attemptsEl = document.getElementById("attempts");
+
+            const inputs = {
+                height: document.getElementById("heightInput"),
+                shape: document.getElementById("shapeInput"),
+                color: document.getElementById("colorInput"),
+                finalCode: document.getElementById("finalInput")
+            };
+
+            const uiState = {
+                solved: {
+                    c1: false,
+                    c2: false,
+                    c3: false,
+                    c4: false
+                },
+                attempts: 0,
+                usedHints: {
+                    c1: false,
+                    c2: false,
+                    c3: false,
+                    c4: false
+                }
+            };
+
+            function normalize(value) {
+                return String(value || "")
+                    .trim()
+                    .replace(/\s+/g, " ")
+                    .toUpperCase();
+            }
+
+            function normalizeCompact(value) {
+                return normalize(value).replace(/\s+/g, "");
+            }
+
+            function readJson(key, fallback) {
+                try {
+                    const raw = localStorage.getItem(key);
+                    if (!raw) {
+                        return fallback;
+                    }
+                    const parsed = JSON.parse(raw);
+                    return parsed && typeof parsed === "object" ? parsed : fallback;
+                } catch (error) {
+                    return fallback;
+                }
+            }
+
+            const progress = {
+                playerName: "Explorer",
+                rank: "Beginner",
+                points: 0,
+                clues: 0,
+                hintsLeft: 3,
+                maxUnlockedRoom: 1,
+                ...readJson(STORAGE_PROGRESS_KEY, {})
+            };
+
+            const allRoomProgress = readJson(STORAGE_ROOM_KEY, {});
+            const roomKey = "room" + ROOM_NUMBER;
+            const savedRoom = allRoomProgress[roomKey] || {};
+            const room1Progress = allRoomProgress.room1 || {};
+
+            if (savedRoom.solved && typeof savedRoom.solved === "object") {
+                uiState.solved = {
+                    ...uiState.solved,
+                    ...savedRoom.solved
+                };
+            }
+
+            if (Number.isFinite(savedRoom.attempts)) {
+                uiState.attempts = Math.max(0, savedRoom.attempts);
+            }
+
+            if (savedRoom.usedHints && typeof savedRoom.usedHints === "object") {
+                uiState.usedHints = {
+                    ...uiState.usedHints,
+                    ...savedRoom.usedHints
+                };
+            }
+
+            function saveState() {
+                localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progress));
+                allRoomProgress[roomKey] = {
+                    solved: uiState.solved,
+                    completed: uiState.solved.c4,
+                    attempts: uiState.attempts,
+                    usedHints: uiState.usedHints,
+                    updatedAt: new Date().toISOString()
+                };
+                localStorage.setItem(STORAGE_ROOM_KEY, JSON.stringify(allRoomProgress));
+            }
+
+            function setStatus(node, message, success) {
+                node.textContent = message;
+                node.className = "status " + (success ? "ok" : "bad");
+            }
+
+            function refreshStats() {
+                playerNameEl.textContent = progress.playerName || "Explorer";
+                rankEl.textContent = progress.rank || "Beginner";
+                pointsEl.textContent = String(Math.max(0, Number(progress.points) || 0));
+                cluesEl.textContent = String(Math.max(0, Number(progress.clues) || 0));
+                hintsEl.textContent = String(Math.max(0, Number(progress.hintsLeft) || 0));
+                attemptsEl.textContent = String(uiState.attempts);
+            }
+
+            function spendMistakePenalty() {
+                uiState.attempts += 1;
+                progress.points = Math.max(0, (Number(progress.points) || 0) - 10);
+                refreshStats();
+                saveState();
+            }
+
+            function consumeHint(hintKey) {
+                if (uiState.usedHints[hintKey]) {
+                    return true;
+                }
+
+                const left = Number(progress.hintsLeft) || 0;
+                if (left <= 0) {
+                    globalStatus.textContent = "No hints left in this run.";
+                    return false;
+                }
+
+                progress.hintsLeft = left - 1;
+                uiState.usedHints[hintKey] = true;
+                refreshStats();
+                saveState();
+                return true;
+            }
+
+            function setDisabled(id, disabled) {
+                const input = document.getElementById(id + "Input");
+                const submit = document.getElementById(id + "Submit");
+                if (input) {
+                    input.disabled = disabled;
+                }
+                if (submit) {
+                    submit.disabled = disabled;
+                }
+            }
+
+            function setLockState() {
+                setDisabled("shape", !uiState.solved.c1);
+                setDisabled("color", !uiState.solved.c2);
+                setDisabled("final", !uiState.solved.c3);
+            }
+
+            function gateRoomAccess() {
+                const unlockedFromHome = (Number(progress.maxUnlockedRoom) || 1) >= 2;
+                const unlockedFromRoom1 = room1Progress.completed === true;
+                const alreadyCompleted = uiState.solved.c4;
+
+                if (alreadyCompleted) {
+                    room3Link.style.display = "inline-flex";
+                    return true;
+                }
+
+                if (unlockedFromHome || unlockedFromRoom1) {
+                    return true;
+                }
+
+                puzzleContainer.innerHTML =
+                    '<section class="locked-screen">Room 2 is locked. Finish Room 1 first, then return here.<br><br><a class="btn ghost" href="room1.html">Go To Room 1</a></section>';
+                return false;
+            }
+
+            function finalizeRoom2() {
+                uiState.solved.c4 = true;
+                progress.points = Math.max(0, Number(progress.points) || 0) + 160;
+                progress.clues = Math.max(0, Number(progress.clues) || 0) + 4;
+                progress.maxUnlockedRoom = Math.max(3, Number(progress.maxUnlockedRoom) || 1);
+                if ((Number(progress.points) || 0) >= 450) {
+                    progress.rank = "Pattern Breaker";
+                }
+                room3Link.style.display = "inline-flex";
+                setStatus(status4, "Vault opened. Room 3 unlocked.", true);
+                globalStatus.textContent = "Room 2 complete. Continue to Room 3.";
+                refreshStats();
+                saveState();
+            }
+
+            function bindEvents() {
+                document.getElementById("heightSubmit").addEventListener("click", function () {
+                    if (uiState.solved.c1) {
+                        return;
+                    }
+                    if (normalize(inputs.height.value) === "130") {
+                        uiState.solved.c1 = true;
+                        setStatus(status1, "Correct. Challenge 2 unlocked.", true);
+                        setLockState();
+                        saveState();
+                        return;
+                    }
+                    spendMistakePenalty();
+                    setStatus(status1, "Wrong answer. Sequence increases by +10.", false);
+                });
+
+                document.getElementById("shapeSubmit").addEventListener("click", function () {
+                    if (!uiState.solved.c1 || uiState.solved.c2) {
+                        return;
+                    }
+                    const answer = normalize(inputs.shape.value);
+                    if (answer === "TRIANGLE") {
+                        uiState.solved.c2 = true;
+                        setStatus(status2, "Correct. Challenge 3 unlocked.", true);
+                        setLockState();
+                        saveState();
+                        return;
+                    }
+                    spendMistakePenalty();
+                    setStatus(status2, "Wrong answer. Think of basic shape cycles.", false);
+                });
+
+                document.getElementById("colorSubmit").addEventListener("click", function () {
+                    if (!uiState.solved.c2 || uiState.solved.c3) {
+                        return;
+                    }
+                    const answer = normalize(inputs.color.value);
+                    if (answer === "BLUE") {
+                        uiState.solved.c3 = true;
+                        setStatus(status3, "Correct. Final vault code unlocked.", true);
+                        setLockState();
+                        saveState();
+                        return;
+                    }
+                    spendMistakePenalty();
+                    setStatus(status3, "Wrong answer. Pattern repeats every three colors.", false);
+                });
+
+                document.getElementById("finalSubmit").addEventListener("click", function () {
+                    if (!uiState.solved.c3 || uiState.solved.c4) {
+                        return;
+                    }
+                    const answer = normalizeCompact(inputs.finalCode.value);
+                    if (answer === "130TRIANGLEBLUE") {
+                        finalizeRoom2();
+                        return;
+                    }
+                    spendMistakePenalty();
+                    setStatus(status4, "Wrong format. Combine C1 + C2 + C3 in order.", false);
+                });
+
+                document.getElementById("hint1").addEventListener("click", function () {
+                    if (!consumeHint("c1")) {
+                        return;
+                    }
+                    globalStatus.textContent = "Hint 1: The number rises by 10 each year.";
+                });
+
+                document.getElementById("hint2").addEventListener("click", function () {
+                    if (!consumeHint("c2")) {
+                        return;
+                    }
+                    globalStatus.textContent = "Hint 2: After square, think of the next simple polygon.";
+                });
+
+                document.getElementById("hint3").addEventListener("click", function () {
+                    if (!consumeHint("c3")) {
+                        return;
+                    }
+                    globalStatus.textContent = "Hint 3: RED, BLUE, GREEN then repeat from RED.";
+                });
+
+                document.getElementById("hint4").addEventListener("click", function () {
+                    if (!consumeHint("c4")) {
+                        return;
+                    }
+                    globalStatus.textContent = "Hint 4: Concatenate exactly: 130 + TRIANGLE + BLUE.";
+                });
+            }
+
+            if (!gateRoomAccess()) {
+                refreshStats();
+                return;
+            }
+
+            if (uiState.solved.c1) {
+                setStatus(status1, "Already solved.", true);
+            }
+            if (uiState.solved.c2) {
+                setStatus(status2, "Already solved.", true);
+            }
+            if (uiState.solved.c3) {
+                setStatus(status3, "Already solved.", true);
+            }
+            if (uiState.solved.c4) {
+                setStatus(status4, "Already solved.", true);
+                room3Link.style.display = "inline-flex";
+                globalStatus.textContent = "Room 2 already complete. Continue to Room 3.";
+            }
+
+            setLockState();
+            refreshStats();
+            bindEvents();
+            saveState();
+        })();
+    </script>
+</body>
+</html>
